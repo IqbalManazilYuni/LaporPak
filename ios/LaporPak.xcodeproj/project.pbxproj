@@ -14,6 +14,9 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7699B88040F8A987B510C191 /* libPods-LaporPak-LaporPakTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-LaporPak-LaporPakTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		2E8A97DC79C64FDBBB42695A /* Caladea-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 088FC84EC4C24BF989040196 /* Caladea-Regular.ttf */; };
+		DC8559A3C3524443844E26F6 /* Ramaraja-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AECEC81672774D6E958CD9E6 /* Ramaraja-Regular.ttf */; };
+		4FE35658180349A59445E9EB /* FontFamily.ts in Resources */ = {isa = PBXBuildFile; fileRef = E1D602DD9DE449A48BD4E7C1 /* FontFamily.ts */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +48,9 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = LaporPak/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-LaporPak-LaporPakTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LaporPak-LaporPakTests.release.xcconfig"; path = "Target Support Files/Pods-LaporPak-LaporPakTests/Pods-LaporPak-LaporPakTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		088FC84EC4C24BF989040196 /* Caladea-Regular.ttf */ = {isa = PBXFileReference; name = "Caladea-Regular.ttf"; path = "../app/assets/fonts/Caladea-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		AECEC81672774D6E958CD9E6 /* Ramaraja-Regular.ttf */ = {isa = PBXFileReference; name = "Ramaraja-Regular.ttf"; path = "../app/assets/fonts/Ramaraja-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		E1D602DD9DE449A48BD4E7C1 /* FontFamily.ts */ = {isa = PBXFileReference; name = "FontFamily.ts"; path = "../app/assets/fonts/FontFamily.ts"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +130,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				62E18ED74AEF40C6BB173741 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -149,6 +156,17 @@
 			);
 			path = Pods;
 			sourceTree = "<group>";
+		};
+		62E18ED74AEF40C6BB173741 /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				088FC84EC4C24BF989040196 /* Caladea-Regular.ttf */,
+				AECEC81672774D6E958CD9E6 /* Ramaraja-Regular.ttf */,
+				E1D602DD9DE449A48BD4E7C1 /* FontFamily.ts */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -245,6 +263,9 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				2E8A97DC79C64FDBBB42695A /* Caladea-Regular.ttf in Resources */,
+				DC8559A3C3524443844E26F6 /* Ramaraja-Regular.ttf in Resources */,
+				4FE35658180349A59445E9EB /* FontFamily.ts in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
