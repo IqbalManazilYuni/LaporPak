@@ -11,9 +11,14 @@ export {default as IconProfile} from './homescreen/icon-profile.svg';
 export {default as IconTentang} from './homescreen/icon-tentang.svg';
 export {default as IconSertifikat} from './homescreen/icon-sertifikat.svg';
 export {default as IconKeluar} from './homescreen/icon-keluar.svg';
-export {default as BgAtasLingkaran} from './homescreen/icon-lingkaran-1.svg'
-export {default as BgBawahLingkaran} from './homescreen/icon-lingkaran-2.svg'
-export {default as BgFull} from './homescreen/bg.svg'
+export {default as BgAtasLingkaran} from './homescreen/icon-lingkaran-1.svg';
+export {default as BgBawahLingkaran} from './homescreen/icon-lingkaran-2.svg';
+export {default as BgFull} from './homescreen/bg.svg';
 export {default as IconPolice} from './homescreen/picture-police.svg';
-
-
+export {default as IconSeach} from './pengaduanscreen/search-normal.svg';
+export {default as IconLeftBack} from './pengaduanscreen/arrow-left.svg';
+export {default as IconAdd} from './pengaduanscreen/tambah.svg';
+export {default as IconPeoplePengaduang} from './pengaduanscreen/icon-people.svg';
+export {default as IconPapan} from './pengaduanscreen/icon-papan.svg';
+export {default as IconWarning} from './pengaduanscreen/icon-alert.svg';
+export {default as IconSuccess} from './pengaduanscreen/success.svg';

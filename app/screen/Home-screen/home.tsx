@@ -27,13 +27,14 @@ import {
   ramarajaReguler,
 } from '../../assets/fonts/FontFamily';
 import Modal from 'react-native-modal';
+import { useNavigation } from '@react-navigation/native';
 
 const {width, height} = Dimensions.get('window');
 
 const menu = [
   {
     title: 'Pengaduan',
-    link: 'daftarorscreen',
+    link: 'Pengaduan',
     icon: () => <IconPengaduan />,
   },
   {
@@ -66,10 +67,12 @@ const images = [
 export const HomeScreen: React.FC = () => {
   const [activeSlide, setActiveSlide] = useState(0);
   const [isModalVisible, setModalVisible] = useState(false);
-
+  const navigation = useNavigation()
   const handleOnPress = (title: string) => {
     if (title === 'Tentang') {
       setModalVisible(!isModalVisible);
+    } else if(title ==="Pengaduan"){
+      navigation.navigate("Pengaduan")
     }
   };
 
@@ -161,6 +164,7 @@ export const HomeScreen: React.FC = () => {
               width: '100%',
               backgroundColor: 'white',
               flexDirection: 'column',
+              borderRadius:16,
               padding: 20,
             }}>
             <Text
@@ -257,7 +261,10 @@ const styles = StyleSheet.create({
     height: '65%',
   },
   paginationContainer: {
-    marginTop: -height * 0.12,
+    position:"absolute",
+    bottom:height*0.012,
+    left:0,
+    right:0,
   },
   activeDotStyle: {
     width: 40,

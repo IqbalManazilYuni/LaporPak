@@ -109,6 +109,7 @@ export const RegisterScreen = ({}) => {
                       }}
                       placeholder="Nama Lengkap"
                       onChangeText={handleChange('nama')}
+                      placeholderTextColor={"#9CA3AF"}
                       onBlur={handleBlur('nama')}
                       value={values.nama}
                     />
@@ -143,6 +144,7 @@ export const RegisterScreen = ({}) => {
                       onChangeText={handleChange('username')}
                       onBlur={handleBlur('username')}
                       value={values.username}
+                      placeholderTextColor={"#9CA3AF"}
                     />
                   </View>
                 </View>
@@ -176,6 +178,7 @@ export const RegisterScreen = ({}) => {
                       onBlur={handleBlur('password')}
                       value={values.password}
                       secureTextEntry={true}
+                      placeholderTextColor={"#9CA3AF"}
                     />
                   </View>
                 </View>
@@ -208,6 +211,7 @@ export const RegisterScreen = ({}) => {
                       onChangeText={handleChange('nomor_telp')}
                       onBlur={handleBlur('nomor_telp')}
                       value={values.nomor_telp}
+                      placeholderTextColor={"#9CA3AF"}
                     />
                   </View>
                 </View>
@@ -240,6 +244,7 @@ export const RegisterScreen = ({}) => {
                       onChangeText={handleChange('alamat')}
                       onBlur={handleBlur('alamat')}
                       value={values.alamat}
+                      placeholderTextColor={"#9CA3AF"}
                     />
                   </View>
                 </View>
