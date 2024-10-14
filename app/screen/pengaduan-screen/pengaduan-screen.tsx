@@ -56,9 +56,14 @@ export const PengaduanScreen: React.FC = () => {
   const navigation = useNavigation();
   const [data, setData] = useState([]);
   const [dataFilter, setDataFilter] = useState([]);
-  const handleTambahPelaporan = () =>{
-    navigation.navigate("TambahPengaduan")
-  }
+  const handleTambahPelaporan = () => {
+    navigation.navigate('TambahPengaduan');
+  };
+
+  const handleDetail = (id: any) => {
+    const dataPengaduan = dataImage.find(item => item.id === id);
+    navigation.navigate('DetailPengaduan');
+  };
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={'#444444'} translucent={true} />
@@ -77,7 +82,10 @@ export const PengaduanScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}>
         <View style={styles.contentCard}>
           {dataImage.map((row, rowIndex) => (
-            <TouchableOpacity key={rowIndex} style={styles.card}>
+            <TouchableOpacity
+              key={rowIndex}
+              style={styles.card}
+              onPress={() => handleDetail(row.id)}>
               <View style={styles.contentImage}>
                 <Image
                   source={row.source}
@@ -86,36 +94,16 @@ export const PengaduanScreen: React.FC = () => {
                 />
               </View>
               <View style={styles.contentDeskripsi}>
-                <Text
-                  style={{
-                    fontFamily: ramarajaReguler,
-                    color: '#374151',
-                    fontSize: height * 0.026,
-                    marginTop: 5,
-                  }}>
+                <Text style={styles.fontJudulPengaduan}>
                   {row.nama_pengaduan}
                 </Text>
                 <View style={{flexDirection: 'row', marginBottom: 5}}>
                   <IconPeoplePengaduang />
-                  <Text
-                    style={{
-                      fontFamily: caladeaReguler,
-                      color: '#707070',
-                      fontSize: height * 0.018,
-                      marginLeft: 10,
-                    }}>
-                    {row.nama_pelapor}
-                  </Text>
+                  <Text style={styles.fontNamaPelapor}>{row.nama_pelapor}</Text>
                 </View>
                 <View style={{flexDirection: 'row', marginVertical: 5}}>
                   <IconPapan />
-                  <Text
-                    style={{
-                      fontFamily: caladeaReguler,
-                      color: '#707070',
-                      fontSize: height * 0.018,
-                      marginLeft: 10,
-                    }}>
+                  <Text style={styles.fontNamaPelapor}>
                     {row.jenis_pelaporan}
                   </Text>
                 </View>
@@ -164,7 +152,9 @@ export const PengaduanScreen: React.FC = () => {
         </View>
       </ScrollView>
       <View style={styles.contentAdd}>
-        <TouchableOpacity style={styles.buttonAdd} onPress={()=>handleTambahPelaporan()}>
+        <TouchableOpacity
+          style={styles.buttonAdd}
+          onPress={() => handleTambahPelaporan()}>
           <IconAdd preserveAspectRatio="none" height={'30%'} width={'30%'} />
         </TouchableOpacity>
       </View>
@@ -205,7 +195,7 @@ const styles = StyleSheet.create({
     borderRadius: (height * 0.1) / 2,
     backgroundColor: '#EBC730',
     alignItems: 'center',
-    elevation:5,
+    elevation: 5,
     justifyContent: 'center',
   },
   contentImage: {
@@ -223,5 +213,17 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '90%',
     flexDirection: 'column',
+  },
+  fontJudulPengaduan: {
+    fontFamily: ramarajaReguler,
+    color: '#374151',
+    fontSize: height * 0.026,
+    marginTop: 5,
+  },
+  fontNamaPelapor: {
+    fontFamily: caladeaReguler,
+    color: '#707070',
+    fontSize: height * 0.018,
+    marginLeft: 10,
   },
 });

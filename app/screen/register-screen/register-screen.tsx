@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Alert,
   Button,
   Dimensions,
   ScrollView,
@@ -11,7 +12,14 @@ import {
   View,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {IconHouse, IconHp, IconLock, IconPeople, IconUsername, LOGO} from '../../assets';
+import {
+  IconHouse,
+  IconHp,
+  IconLock,
+  IconPeople,
+  IconUsername,
+  LOGO,
+} from '../../assets';
 import {
   caladeaBold,
   caladeaReguler,
@@ -21,11 +29,32 @@ const {width, height} = Dimensions.get('window');
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import {useNavigation} from '@react-navigation/native';
+import {useCreatePengguna} from '../../hook/tambahPengguna';
+import Toast from 'react-native-toast-message';
 
 export const RegisterScreen = ({}) => {
   const navigation = useNavigation();
+  const {createPengguna, loading, error} = useCreatePengguna();
+
+  const handleFormSubmit = async (values: any) => {
+    const result = await createPengguna(values); // Panggil MobX action
+    if (result?.success) {
+      Toast.show({
+        type: 'success',
+        text1: 'Berhasil',
+        text2: result.message,
+      });
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: 'Gagal',
+        text2: result?.message,
+      });
+    }
+  };
+
   const handleNextPageDaftar = () => {
-    navigation.navigate('Login');
+    navigation.navigate('Register');
   };
   return (
     <SafeAreaView style={styles.backgroundScreen}>
@@ -65,14 +94,12 @@ export const RegisterScreen = ({}) => {
             initialValues={{
               username: '',
               password: '',
-              nama: '',
-              nomor_telp: '',
-              alamat: '',
+              name: '',
+              nomor_hp: '',
+              addres: '',
             }}
             validationSchema={validationSchema}
-            onSubmit={values => {
-              console.log(values);
-            }}>
+            onSubmit={handleFormSubmit}>
             {({
               handleChange,
               handleBlur,
@@ -87,7 +114,7 @@ export const RegisterScreen = ({}) => {
                     styles.contentInput,
                     {
                       borderColor:
-                        touched.nama && errors.nama ? 'red' : '#D1D5DB',
+                        touched.name && errors.name ? 'red' : '#D1D5DB',
                     },
                   ]}>
                   <View
@@ -108,10 +135,10 @@ export const RegisterScreen = ({}) => {
                         color: '#9CA3AF',
                       }}
                       placeholder="Nama Lengkap"
-                      onChangeText={handleChange('nama')}
-                      placeholderTextColor={"#9CA3AF"}
-                      onBlur={handleBlur('nama')}
-                      value={values.nama}
+                      onChangeText={handleChange('name')}
+                      placeholderTextColor={'#9CA3AF'}
+                      onBlur={handleBlur('name')}
+                      value={values.name}
                     />
                   </View>
                 </View>
@@ -144,7 +171,7 @@ export const RegisterScreen = ({}) => {
                       onChangeText={handleChange('username')}
                       onBlur={handleBlur('username')}
                       value={values.username}
-                      placeholderTextColor={"#9CA3AF"}
+                      placeholderTextColor={'#9CA3AF'}
                     />
                   </View>
                 </View>
@@ -178,7 +205,7 @@ export const RegisterScreen = ({}) => {
                       onBlur={handleBlur('password')}
                       value={values.password}
                       secureTextEntry={true}
-                      placeholderTextColor={"#9CA3AF"}
+                      placeholderTextColor={'#9CA3AF'}
                     />
                   </View>
                 </View>
@@ -187,7 +214,7 @@ export const RegisterScreen = ({}) => {
                     styles.contentInput,
                     {
                       borderColor:
-                        touched.nomor_telp && errors.nomor_telp ? 'red' : '#D1D5DB',
+                        touched.nomor_hp && errors.nomor_hp ? 'red' : '#D1D5DB',
                     },
                   ]}>
                   <View
@@ -208,10 +235,10 @@ export const RegisterScreen = ({}) => {
                         color: '#9CA3AF',
                       }}
                       placeholder="Nomor Hp"
-                      onChangeText={handleChange('nomor_telp')}
-                      onBlur={handleBlur('nomor_telp')}
-                      value={values.nomor_telp}
-                      placeholderTextColor={"#9CA3AF"}
+                      onChangeText={handleChange('nomor_hp')}
+                      onBlur={handleBlur('nomor_hp')}
+                      value={values.nomor_hp}
+                      placeholderTextColor={'#9CA3AF'}
                     />
                   </View>
                 </View>
@@ -220,7 +247,7 @@ export const RegisterScreen = ({}) => {
                     styles.contentInput,
                     {
                       borderColor:
-                        touched.alamat && errors.alamat ? 'red' : '#D1D5DB',
+                        touched.addres && errors.addres ? 'red' : '#D1D5DB',
                     },
                   ]}>
                   <View
@@ -241,14 +268,16 @@ export const RegisterScreen = ({}) => {
                         color: '#9CA3AF',
                       }}
                       placeholder="Alamat Lengkap"
-                      onChangeText={handleChange('alamat')}
-                      onBlur={handleBlur('alamat')}
-                      value={values.alamat}
-                      placeholderTextColor={"#9CA3AF"}
+                      onChangeText={handleChange('addres')}
+                      onBlur={handleBlur('addres')}
+                      value={values.addres}
+                      placeholderTextColor={'#9CA3AF'}
                     />
                   </View>
                 </View>
-                <TouchableOpacity style={styles.buttonSubmit}>
+                <TouchableOpacity
+                  style={styles.buttonSubmit}
+                  onPress={() => handleSubmit()}>
                   <Text
                     style={{
                       fontFamily: caladeaBold,
@@ -295,12 +324,13 @@ export const RegisterScreen = ({}) => {
   );
 };
 const validationSchema = Yup.object().shape({
-  username: Yup.string()
-    .min(3, 'Username harus lebih dari 3 karakter!')
-    .required('Username wajib diisi'),
-  password: Yup.string()
-    .min(6, 'Password harus lebih dari 6 karakter!')
-    .required('Password wajib diisi'),
+  username: Yup.string().required('Username wajib diisi'),
+  password: Yup.string().required('Password wajib diisi'),
+  name: Yup.string().required('Nama wajib diisi'),
+  nomor_hp: Yup.string()
+    .matches(/^[0-9]+$/, 'Hanya angka')
+    .required('Nomor telepon wajib diisi'),
+  addres: Yup.string().required('Alamat wajib diisi'),
 });
 const styles = StyleSheet.create({
   backgroundScreen: {

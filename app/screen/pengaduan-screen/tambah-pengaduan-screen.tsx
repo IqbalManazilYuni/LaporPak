@@ -154,58 +154,12 @@ export const TambahPengaduanScreen: React.FC = () => {
         style={styles.contentForm}
         showsVerticalScrollIndicator={false}>
         <View style={{paddingTop: 15}}>
-          <Text
-            style={{
-              fontFamily: caladeaReguler,
-              fontSize: height * 0.018,
-              color: '#444444',
-              marginVertical: 5,
-            }}>
-            Nama Pelapor
-          </Text>
-          <Text
-            style={{
-              fontFamily: caladeaReguler,
-              fontSize: height * 0.02,
-              color: 'black',
-              marginVertical: 5,
-            }}>
-            Budi Hartono
-          </Text>
-          <Text
-            style={{
-              fontFamily: caladeaReguler,
-              fontSize: height * 0.018,
-              color: '#444444',
-              marginVertical: 5,
-            }}>
-            Tanggal Pelaporan
-          </Text>
-          <Text
-            style={{
-              fontFamily: caladeaReguler,
-              fontSize: height * 0.02,
-              color: 'black',
-              marginVertical: 5,
-            }}>
-            {formattedDate}
-          </Text>
-          <Text
-            style={{
-              fontFamily: caladeaReguler,
-              fontSize: height * 0.018,
-              color: '#444444',
-              marginVertical: 5,
-            }}>
-            Lokasi Pelaporan
-          </Text>
-          <Text
-            style={{
-              fontFamily: caladeaReguler,
-              fontSize: height * 0.02,
-              color: 'black',
-              marginVertical: 5,
-            }}>
+          <Text style={styles.fontTitle}>Nama Pelapor</Text>
+          <Text style={styles.fontSubtitle}>Budi Hartono</Text>
+          <Text style={styles.fontTitle}>Tanggal Pelaporan</Text>
+          <Text style={styles.fontSubtitle}>{formattedDate}</Text>
+          <Text style={styles.fontTitle}>Lokasi Pelaporan</Text>
+          <Text style={styles.fontSubtitle}>
             {location
               ? `${location.latitude}, ${location.longitude}`
               : 'Fetching location...'}
@@ -220,9 +174,9 @@ export const TambahPengaduanScreen: React.FC = () => {
               judul: '',
               deskripsi: '',
             }}
-            validationSchema={validationSchema}
+            // validationSchema={validationSchema}
             onSubmit={values => {
-              console.log(values);
+              console.log(imageUri);
             }}>
             {({
               handleChange,
@@ -233,15 +187,7 @@ export const TambahPengaduanScreen: React.FC = () => {
               touched,
             }) => (
               <>
-                <Text
-                  style={{
-                    fontFamily: caladeaReguler,
-                    color: '#444444',
-                    fontSize: height * 0.018,
-                    marginVertical: 5,
-                  }}>
-                  Kota
-                </Text>
+                <Text style={styles.fontTitle}>Kota</Text>
                 <Dropdown
                   data={data}
                   maxHeight={300}
@@ -267,15 +213,7 @@ export const TambahPengaduanScreen: React.FC = () => {
                     height: 50,
                   }}
                 />
-                <Text
-                  style={{
-                    fontFamily: caladeaReguler,
-                    color: '#444444',
-                    fontSize: height * 0.018,
-                    marginVertical: 5,
-                  }}>
-                  Jenis Pengaduan
-                </Text>
+                <Text style={styles.fontTitle}>Jenis Pengaduan</Text>
                 <Dropdown
                   data={dataPengaduan}
                   maxHeight={300}
@@ -301,68 +239,21 @@ export const TambahPengaduanScreen: React.FC = () => {
                     backgroundColor: '#F9FAFB',
                   }}
                 />
-                <Text
-                  style={{
-                    fontFamily: caladeaReguler,
-                    color: '#444444',
-                    fontSize: height * 0.018,
-                    marginVertical: 5,
-                  }}>
-                  Judul
-                </Text>
+                <Text style={styles.fontTitle}>Judul</Text>
                 <TextInput
-                  style={{
-                    backgroundColor: '#F9FAFB',
-                    padding: 10,
-                    borderRadius: 8,
-                    marginVertical: 5,
-                    borderWidth: 1,
-                    height: 50,
-                    borderColor: '#D1D5DB',
-                    fontFamily: caladeaReguler,
-                    color: '#9CA3AF',
-                    fontSize: height * 0.02,
-                  }}
+                  style={styles.fontTextInput}
                   placeholder="Masukkan Judul..."
                   placeholderTextColor={'#9CA3AF'}
                 />
-                <Text
-                  style={{
-                    fontFamily: caladeaReguler,
-                    color: '#444444',
-                    fontSize: height * 0.018,
-                    marginVertical: 5,
-                  }}>
-                  Deskripsi
-                </Text>
+                <Text style={styles.fontTitle}>Deskripsi</Text>
                 <TextInput
-                  style={{
-                    backgroundColor: '#F9FAFB',
-                    padding: 10,
-                    borderRadius: 8,
-                    marginVertical: 5,
-                    borderWidth: 1,
-                    height: 100,
-                    borderColor: '#D1D5DB',
-                    fontFamily: caladeaReguler,
-                    color: '#9CA3AF',
-                    fontSize: height * 0.02,
-                    textAlignVertical: 'top',
-                  }}
+                  style={styles.fontTextDeskripsi}
                   placeholder="Masukkan Deskripsi..."
                   placeholderTextColor={'#9CA3AF'}
                   multiline
                 />
-                <Text
-                  style={{
-                    fontFamily: caladeaReguler,
-                    color: '#444444',
-                    fontSize: height * 0.018,
-                    marginVertical: 5,
-                  }}>
-                  Foto
-                </Text>
-                <View style={{width: '100%', marginVertical:5}}>
+                <Text style={styles.fontTitle}>Foto</Text>
+                <View style={{width: '100%', marginVertical: 5}}>
                   {imageUri && (
                     <Image
                       source={{uri: imageUri}}
@@ -392,12 +283,6 @@ export const TambahPengaduanScreen: React.FC = () => {
                     </Text>
                   </TouchableOpacity>
                 </View>
-                {/* <Button title="Open Camera" onPress={openCamera} />
-                <Button
-                  title="Open Gallery"
-                  onPress={openGallery}
-                /> */}
-
                 <View style={{alignItems: 'center'}}>
                   <TouchableOpacity
                     style={{
@@ -407,7 +292,7 @@ export const TambahPengaduanScreen: React.FC = () => {
                       alignItems: 'center',
                       justifyContent: 'center',
                       borderRadius: 54,
-                      marginVertical:15
+                      marginVertical: 15,
                     }}
                     onPress={() => handleSubmit()}>
                     <Text
@@ -456,5 +341,42 @@ const styles = StyleSheet.create({
   selectedTextStyle: {
     fontFamily: caladeaReguler,
     color: '#9CA3AF',
+  },
+  fontTitle: {
+    fontFamily: caladeaReguler,
+    fontSize: height * 0.018,
+    color: '#444444',
+    marginVertical: 5,
+  },
+  fontSubtitle: {
+    fontFamily: caladeaReguler,
+    fontSize: height * 0.02,
+    color: 'black',
+    marginVertical: 5,
+  },
+  fontTextInput: {
+    backgroundColor: '#F9FAFB',
+    padding: 10,
+    borderRadius: 8,
+    marginVertical: 5,
+    borderWidth: 1,
+    height: 50,
+    borderColor: '#D1D5DB',
+    fontFamily: caladeaReguler,
+    color: '#9CA3AF',
+    fontSize: height * 0.02,
+  },
+  fontTextDeskripsi: {
+    backgroundColor: '#F9FAFB',
+    padding: 10,
+    borderRadius: 8,
+    marginVertical: 5,
+    borderWidth: 1,
+    height: 100,
+    borderColor: '#D1D5DB',
+    fontFamily: caladeaReguler,
+    color: '#9CA3AF',
+    fontSize: height * 0.02,
+    textAlignVertical: 'top',
   },
 });

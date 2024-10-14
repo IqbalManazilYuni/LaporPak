@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   },
   bgAtasContainer: {
     width: '30%',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
   },
   iconPoliceContainer: {
     position: 'absolute',
