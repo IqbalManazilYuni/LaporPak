@@ -2,6 +2,9 @@ import { flow, types } from "mobx-state-tree";
 import axiosInstance from "./axiosInterceptors";
 import { API_BASE_URL } from "./server";
 import { DetailPengaduanModels } from "../models/detailPengaduan";
+import { penggunaStore } from "./PenggunaUtils";
+
+const { currentUser, logout } = penggunaStore;
 
 const DetailPengaduanStore = types
     .model("DetailPengaduanStore", {
@@ -11,15 +14,21 @@ const DetailPengaduanStore = types
     })
     .actions((self) => ({
         getDataDetailPengaduan: flow(function* () {
-            console.log("ayam1");
-            
             self.loading = true;
             self.error = null;
             try {
                 const response = yield axiosInstance.get(
                     `${API_BASE_URL}/api/pengaduan`
                 );
-                self.detailpengaduan = response.data.payload;
+                // Filter the data based on the current user's username
+                const dataWithIndex = response.data.payload
+                    .filter((item: any) => item.nama_pelapor === currentUser?.username) // Filtering based on nama_pelapor
+                    .map((item: any, idx: any) => ({
+                        ...item,
+                        index: (idx + 1).toString(),
+                    }));
+
+                self.detailpengaduan = dataWithIndex;
             } catch (err) {
                 self.error = "Failed to fetch complaint types";
             } finally {

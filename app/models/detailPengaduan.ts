@@ -2,6 +2,7 @@ import { types } from "mobx-state-tree";
 
 export const DetailPengaduanModels = types.model("DetailPengaduan", {
     _id: types.identifier,
+    index: types.optional(types.string, ""),
     judul: types.optional(types.string, ""),
     deskripsi: types.optional(types.string, ""),
     nama_pelapor: types.optional(types.string, ""),

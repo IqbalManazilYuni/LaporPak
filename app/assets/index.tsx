@@ -22,3 +22,7 @@ export {default as IconPeoplePengaduang} from './pengaduanscreen/icon-people.svg
 export {default as IconPapan} from './pengaduanscreen/icon-papan.svg';
 export {default as IconWarning} from './pengaduanscreen/icon-alert.svg';
 export {default as IconSuccess} from './pengaduanscreen/success.svg';
+export {default as IconNomorDetail} from './DetailScreen/nomor_laporan.svg';
+export {default as IconTanggalDetail} from './DetailScreen/tanggal.svg';
+export {default as IconKategoriDetail} from './DetailScreen/jenis.svg';
+export {default as IconOrangDetail} from './DetailScreen/pelapor.svg';

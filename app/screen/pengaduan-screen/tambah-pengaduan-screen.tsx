@@ -142,6 +142,7 @@ export const TambahPengaduanScreen: React.FC = observer(
                 judul: '',
                 deskripsi: '',
               }}
+              validationSchema={validationSchema}
               onSubmit={async values => {
                 const formData = new FormData();
                 formData.append('tanggal', formattedDate);
@@ -207,6 +208,11 @@ export const TambahPengaduanScreen: React.FC = observer(
                       height: 50,
                     }}
                   />
+                  {touched.nama_daerah && errors.nama_daerah && (
+                    <Text style={{color: 'red', fontSize: 12}}>
+                      {errors.nama_daerah}
+                    </Text>
+                  )}
                   <Text style={styles.fontTitle}>Jenis Pengaduan</Text>
                   <Dropdown
                     data={jenisPengaduanList.map(item => ({
@@ -238,6 +244,11 @@ export const TambahPengaduanScreen: React.FC = observer(
                       backgroundColor: '#F9FAFB',
                     }}
                   />
+                  {touched.jenis_pengaduan && errors.jenis_pengaduan && (
+                    <Text style={{color: 'red', fontSize: 12}}>
+                      {errors.jenis_pengaduan}
+                    </Text>
+                  )}
 
                   <Text style={styles.fontTitle}>Judul</Text>
                   <TextInput
@@ -248,6 +259,11 @@ export const TambahPengaduanScreen: React.FC = observer(
                     placeholder="Masukkan Judul..."
                     placeholderTextColor={'#9CA3AF'}
                   />
+                  {touched.judul && errors.judul && (
+                    <Text style={{color: 'red', fontSize: 12}}>
+                      {errors.judul}
+                    </Text>
+                  )}
                   <Text style={styles.fontTitle}>Deskripsi</Text>
                   <TextInput
                     style={styles.fontTextDeskripsi}
@@ -258,6 +274,11 @@ export const TambahPengaduanScreen: React.FC = observer(
                     placeholderTextColor={'#9CA3AF'}
                     multiline
                   />
+                  {touched.deskripsi && errors.deskripsi && (
+                    <Text style={{color: 'red', fontSize: 12}}>
+                      {errors.deskripsi}
+                    </Text>
+                  )}
                   <Text style={styles.fontTitle}>Foto</Text>
                   <View style={{width: '100%', marginVertical: 5}}>
                     {imageUri && (
@@ -293,14 +314,15 @@ export const TambahPengaduanScreen: React.FC = observer(
                     <TouchableOpacity
                       style={{
                         width: '90%',
-                        backgroundColor: '#EBC830',
+                        backgroundColor: !imageUri ? '#FFEB97' : '#EBC830',
                         height: height * 0.05,
                         alignItems: 'center',
                         justifyContent: 'center',
                         borderRadius: 54,
                         marginVertical: 15,
                       }}
-                      onPress={() => handleSubmit()}>
+                      onPress={() => handleSubmit()}
+                      disabled={!imageUri ? true : false}>
                       <Text
                         style={{
                           fontFamily: caladeaBold,
@@ -322,13 +344,10 @@ export const TambahPengaduanScreen: React.FC = observer(
 );
 
 const validationSchema = Yup.object().shape({
-  username: Yup.string()
-    .min(3, 'Username harus lebih dari 3 karakter!')
-    .required('Username wajib diisi'),
   nama_daerah: Yup.string().required('Kota wajib dipilih!'),
-  password: Yup.string()
-    .min(6, 'Password harus lebih dari 6 karakter!')
-    .required('Password wajib diisi'),
+  jenis_pengaduan: Yup.string().required('Jenis pengaduan wajib dipilih!'),
+  judul: Yup.string().required('Judul wajib diisi!'),
+  deskripsi: Yup.string().required('Deskripsi wajib diisi!'),
 });
 
 const styles = StyleSheet.create({

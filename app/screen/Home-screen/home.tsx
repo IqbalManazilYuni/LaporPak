@@ -125,6 +125,7 @@ export const HomeScreen: React.FC = () => {
             itemWidth={width}
             layout={'default'}
             loop={true}
+            autoplayInterval={100000}
             autoplay={true}
             onSnapToItem={index => setActiveSlide(index)}
           />
@@ -223,7 +224,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 30,
+    paddingVertical: 5,
     borderRadius: 16,
   },
   image: {
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
   },
   paginationContainer: {
     position: 'absolute',
-    bottom: height * 0.012,
+    bottom:-height*0.02,
     left: 0,
     right: 0,
   },

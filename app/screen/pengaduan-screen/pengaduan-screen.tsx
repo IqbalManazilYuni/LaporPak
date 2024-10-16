@@ -33,39 +33,12 @@ import {observer} from 'mobx-react-lite';
 import Loading from '../../components/loading/Loading';
 import {detailPengaduanStore} from '../../utils/DetailPengaduanUtils';
 
-const dataImage = [
-  {
-    id: 1,
-    nama_pengaduan: 'Buang Sampah Sembarangan',
-    nama_pelapor: 'Muhammad Hartono',
-    jenis_pelaporan: 'Kawasan Tertib',
-    source: require('../../assets/homescreen/foto.png'),
-    status: 'menunggu',
-  },
-  {
-    id: 2,
-    nama_pengaduan: 'Buang Sampah Sembarangan',
-    nama_pelapor: 'Muhammad Hartono',
-    jenis_pelaporan: 'Kawasan Tertib',
-    source: require('../../assets/homescreen/foto.png'),
-    status: 'menunggu',
-  },
-  {
-    id: 3,
-    nama_pengaduan: 'Buang Sampah Sembarangan',
-    nama_pelapor: 'Muhammad Hartono',
-    jenis_pelaporan: 'Kawasan Tertib',
-    source: require('../../assets/homescreen/foto.png'),
-    status: 'sukses',
-  },
-];
-
 const {width, height} = Dimensions.get('window');
 
 export const PengaduanScreen: React.FC = observer(function PengaduanScreen() {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
-  const {detailPengaduanList, loading3, error3} = useFetchDetailPengaduan();
+  const {detailPengaduanList, loading3} = useFetchDetailPengaduan();
   const data = detailPengaduanList;
   const [dataFilter, setDataFilter] = useState(data);
   const [refreshing, setRefreshing] = useState(false);
@@ -75,6 +48,10 @@ export const PengaduanScreen: React.FC = observer(function PengaduanScreen() {
   };
 
   const fetchData = async () => {
+    await detailPengaduanStore.getDataDetailPengaduan();
+    setDataFilter(detailPengaduanStore.detailpengaduan);
+  };
+  const fetchData2 = async () => {
     setRefreshing(true);
     await detailPengaduanStore.getDataDetailPengaduan();
     setDataFilter(detailPengaduanStore.detailpengaduan);
@@ -87,8 +64,9 @@ export const PengaduanScreen: React.FC = observer(function PengaduanScreen() {
 
   const handleDetail = (id: any) => {
     const dataPengaduan = dataFilter.find(item => item._id === id);
-    console.log(dataPengaduan);
-    navigation.navigate('DetailPengaduan');
+    navigation.navigate('DetailPengaduan', {
+      state: {_id: dataPengaduan?._id},
+    });
   };
   return (
     <SafeAreaView style={styles.container}>
@@ -110,7 +88,7 @@ export const PengaduanScreen: React.FC = observer(function PengaduanScreen() {
         style={{flex: 1, marginTop: height * 0.02}}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={fetchData} />
+          <RefreshControl refreshing={refreshing} onRefresh={fetchData2} />
         }>
         <View style={styles.contentCard}>
           {dataFilter.map((row, rowIndex) => (
