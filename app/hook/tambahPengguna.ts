@@ -21,3 +21,28 @@ export const useCreatePengguna = () => {
 
     return { createPengguna, loading, error };
 };
+
+export const useLoginPengguna = () => {
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+  
+    const loginPengguna = async (credentials: { username: string; password: string }) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await penggunaStore.loginPengguna(credentials);
+        return result;
+      } catch (err) {
+        setError("Gagal login");
+        return { success: false, message: "Gagal login" };
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    const logout = () => {
+      penggunaStore.logout();
+    };
+  
+    return { loginPengguna, logout, loading, error };
+  };

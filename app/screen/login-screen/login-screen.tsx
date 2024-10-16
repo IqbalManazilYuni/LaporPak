@@ -1,5 +1,7 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
+  Alert,
+  BackHandler,
   Button,
   Dimensions,
   StatusBar,
@@ -19,16 +21,45 @@ import {
 const {width, height} = Dimensions.get('window');
 import {Formik} from 'formik';
 import * as Yup from 'yup';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
+import {useLoginPengguna} from '../../hook/tambahPengguna';
+import Loading from '../../components/loading/Loading';
 
 export const LoginScreen = ({}) => {
   const navigation = useNavigation();
+  const {loginPengguna, loading, error} = useLoginPengguna();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const backAction = () => {
+        Alert.alert('Hold on!', 'Are you sure you want to exit the app?', [
+          {
+            text: 'Cancel',
+            onPress: () => null,
+            style: 'cancel',
+          },
+          {text: 'YES', onPress: () => BackHandler.exitApp()},
+        ]);
+        return true;
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        backAction,
+      );
+
+      return () => backHandler.remove(); // Clean up event listener when screen is unfocused
+    }, []),
+  );
+
   const handleNextPageDaftar = () => {
     navigation.navigate('Register');
   };
   return (
     <SafeAreaView style={styles.backgroundScreen}>
       <StatusBar backgroundColor={'#444444'} />
+      {loading && <Loading />}
       <View style={styles.contentUp}>
         <Text
           style={{
@@ -62,10 +93,24 @@ export const LoginScreen = ({}) => {
         <Formik
           initialValues={{username: '', password: ''}}
           validationSchema={validationSchema}
-          onSubmit={values => {
-            // Proses pengiriman data
+          onSubmit={async values => {
             console.log(values);
-            navigation.navigate("Home")
+
+            const result = await loginPengguna(values);
+            if (result?.success) {
+              Toast.show({
+                type: 'success',
+                text1: 'Berhasil',
+                text2: result.message,
+              });
+              navigation.navigate('Home');
+            } else {
+              Toast.show({
+                type: 'error',
+                text1: 'Gagal',
+                text2: result?.message,
+              });
+            }
           }}>
           {({
             handleChange,

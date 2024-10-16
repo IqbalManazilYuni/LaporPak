@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   Button,
+  BackHandler,
 } from 'react-native';
 import {
   BgAtasLingkaran,
@@ -27,7 +28,9 @@ import {
   ramarajaReguler,
 } from '../../assets/fonts/FontFamily';
 import Modal from 'react-native-modal';
-import { useNavigation } from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {penggunaStore} from '../../utils/PenggunaUtils';
+import ModalTentang from '../../components/modal/modal-tentang/ModalTentang';
 
 const {width, height} = Dimensions.get('window');
 
@@ -65,14 +68,31 @@ const images = [
 ];
 
 export const HomeScreen: React.FC = () => {
+  const {currentUser, logout} = penggunaStore;
   const [activeSlide, setActiveSlide] = useState(0);
   const [isModalVisible, setModalVisible] = useState(false);
-  const navigation = useNavigation()
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const backAction = () => {
+        return true;
+      };
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        backAction,
+      );
+      return () => backHandler.remove();
+    }, []),
+  );
+
+  const navigation = useNavigation();
   const handleOnPress = (title: string) => {
     if (title === 'Tentang') {
       setModalVisible(!isModalVisible);
-    } else if(title ==="Pengaduan"){
-      navigation.navigate("Pengaduan")
+    } else if (title === 'Pengaduan') {
+      navigation.navigate('Pengaduan');
+    } else if (title === 'Keluar') {
+      // setIsModalDelete(true);
     }
   };
 
@@ -96,7 +116,6 @@ export const HomeScreen: React.FC = () => {
           </View>
         </View>
       </View>
-
       <View style={styles.contentImage}>
         <View style={styles.carouselContainer}>
           <Carousel
@@ -156,55 +175,10 @@ export const HomeScreen: React.FC = () => {
           </View>
         </View>
       </View>
-      <Modal isVisible={isModalVisible} animationIn={"bounceIn"} animationOut={"bounceOut"} animationInTiming={300} onBackdropPress={()=>setModalVisible(false)}>
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          <View
-            style={{
-              height: '30%',
-              width: '100%',
-              backgroundColor: 'white',
-              flexDirection: 'column',
-              borderRadius:16,
-              padding: 20,
-            }}>
-            <Text
-              style={{
-                fontFamily: ramarajaReguler,
-                color: '#374151',
-                fontSize: height * 0.032,
-                marginBottom: height * 0.003,
-              }}>
-              Tentang
-            </Text>
-            <Text
-              style={{
-                fontFamily: caladeaReguler,
-                color: '#707070',
-                fontSize: height * 0.025,
-              }}>
-              Lapor Pak Sumbar adalah Aplikasi untuk pengaduan masyarakat
-              Provinsi Sumatera Barat
-            </Text>
-            <View
-              style={{
-                alignItems: 'flex-end',
-                flex: 1,
-                justifyContent: 'flex-end',
-              }}>
-              <TouchableOpacity onPress={() => setModalVisible(false)}>
-                <Text
-                  style={{
-                    fontFamily: caladeaBold,
-                    color: '#EBC730',
-                    fontSize: height * 0.028,
-                  }}>
-                  Tutup
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <ModalTentang
+        isOpen={isModalVisible}
+        onClose={() => setModalVisible(false)}
+      />
     </SafeAreaView>
   );
 };
@@ -261,10 +235,10 @@ const styles = StyleSheet.create({
     height: '65%',
   },
   paginationContainer: {
-    position:"absolute",
-    bottom:height*0.012,
-    left:0,
-    right:0,
+    position: 'absolute',
+    bottom: height * 0.012,
+    left: 0,
+    right: 0,
   },
   activeDotStyle: {
     width: 40,

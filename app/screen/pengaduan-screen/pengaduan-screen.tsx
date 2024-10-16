@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
   Image,
@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
   Text,
+  RefreshControl,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Header} from '../../components/header/Header';
@@ -20,9 +21,17 @@ import {
   IconSuccess,
   IconWarning,
 } from '../../assets';
-import {useNavigation} from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useIsFocused,
+  useNavigation,
+} from '@react-navigation/native';
 import SearchComponent from '../../components/search/Search';
 import {caladeaReguler, ramarajaReguler} from '../../assets/fonts/FontFamily';
+import {useFetchDetailPengaduan} from '../../hook/tambahPengaduan';
+import {observer} from 'mobx-react-lite';
+import Loading from '../../components/loading/Loading';
+import {detailPengaduanStore} from '../../utils/DetailPengaduanUtils';
 
 const dataImage = [
   {
@@ -52,16 +61,33 @@ const dataImage = [
 ];
 
 const {width, height} = Dimensions.get('window');
-export const PengaduanScreen: React.FC = () => {
+
+export const PengaduanScreen: React.FC = observer(function PengaduanScreen() {
   const navigation = useNavigation();
-  const [data, setData] = useState([]);
-  const [dataFilter, setDataFilter] = useState([]);
+  const isFocused = useIsFocused();
+  const {detailPengaduanList, loading3, error3} = useFetchDetailPengaduan();
+  const data = detailPengaduanList;
+  const [dataFilter, setDataFilter] = useState(data);
+  const [refreshing, setRefreshing] = useState(false);
+
   const handleTambahPelaporan = () => {
     navigation.navigate('TambahPengaduan');
   };
 
+  const fetchData = async () => {
+    setRefreshing(true);
+    await detailPengaduanStore.getDataDetailPengaduan();
+    setDataFilter(detailPengaduanStore.detailpengaduan);
+    setRefreshing(false);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [isFocused]);
+
   const handleDetail = (id: any) => {
-    const dataPengaduan = dataImage.find(item => item.id === id);
+    const dataPengaduan = dataFilter.find(item => item._id === id);
+    console.log(dataPengaduan);
     navigation.navigate('DetailPengaduan');
   };
   return (
@@ -72,31 +98,35 @@ export const PengaduanScreen: React.FC = () => {
         ImgBack={() => <IconLeftBack />}
         onBackPress={() => navigation.goBack()}
       />
+      {loading3 && <Loading />}
+      {detailPengaduanStore.loading && <Loading />}
+
       <SearchComponent
         data={data}
         setFiltered={setDataFilter}
-        filterKey="nama_pengaduan"
+        filterKey="judul"
       />
       <ScrollView
         style={{flex: 1, marginTop: height * 0.02}}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={fetchData} />
+        }>
         <View style={styles.contentCard}>
-          {dataImage.map((row, rowIndex) => (
+          {dataFilter.map((row, rowIndex) => (
             <TouchableOpacity
               key={rowIndex}
               style={styles.card}
-              onPress={() => handleDetail(row.id)}>
+              onPress={() => handleDetail(row._id)}>
               <View style={styles.contentImage}>
                 <Image
-                  source={row.source}
+                  source={{uri: row.uri_foto}}
                   style={styles.image}
                   resizeMode="cover"
                 />
               </View>
               <View style={styles.contentDeskripsi}>
-                <Text style={styles.fontJudulPengaduan}>
-                  {row.nama_pengaduan}
-                </Text>
+                <Text style={styles.fontJudulPengaduan}>{row.judul}</Text>
                 <View style={{flexDirection: 'row', marginBottom: 5}}>
                   <IconPeoplePengaduang />
                   <Text style={styles.fontNamaPelapor}>{row.nama_pelapor}</Text>
@@ -104,7 +134,7 @@ export const PengaduanScreen: React.FC = () => {
                 <View style={{flexDirection: 'row', marginVertical: 5}}>
                   <IconPapan />
                   <Text style={styles.fontNamaPelapor}>
-                    {row.jenis_pelaporan}
+                    {row.jenis_pengaduan}
                   </Text>
                 </View>
                 <View style={{flex: 1, alignItems: 'center'}}>
@@ -160,7 +190,7 @@ export const PengaduanScreen: React.FC = () => {
       </View>
     </SafeAreaView>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

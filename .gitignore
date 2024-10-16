@@ -76,3 +76,6 @@ yarn-error.log
 node_modules/
 ios/
 android/
+
+.env
+utils/server.ts

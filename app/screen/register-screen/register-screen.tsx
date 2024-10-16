@@ -44,6 +44,7 @@ export const RegisterScreen = ({}) => {
         text1: 'Berhasil',
         text2: result.message,
       });
+      navigation.navigate('Login');
     } else {
       Toast.show({
         type: 'error',
@@ -54,7 +55,7 @@ export const RegisterScreen = ({}) => {
   };
 
   const handleNextPageDaftar = () => {
-    navigation.navigate('Register');
+    navigation.navigate('Login');
   };
   return (
     <SafeAreaView style={styles.backgroundScreen}>
