@@ -121,7 +121,11 @@ export const PengaduanScreen: React.FC = observer(function PengaduanScreen() {
                       width: '80%',
                       height: 20,
                       backgroundColor:
-                        row.status === 'menunggu' ? '#FF0000' : '#2E7528',
+                        row.status === 'menunggu'
+                          ? '#FF0000'
+                          : row.status === 'ditindaklanjuti'
+                            ? '#A0522D'
+                            : '#2E7528',
                       opacity: 0.53,
                       borderRadius: 5,
                       alignItems: 'center',
@@ -138,6 +142,16 @@ export const PengaduanScreen: React.FC = observer(function PengaduanScreen() {
                             color: '#A91010',
                           }}>
                           Menunggu
+                        </Text>
+                      </>
+                    ) : row.status === 'ditindaklanjuti' ? (
+                      <>
+                        <Text
+                          style={{
+                            fontFamily: caladeaReguler,
+                            color: '#A0522D',
+                          }}>
+                          Ditindaklanjuti
                         </Text>
                       </>
                     ) : (

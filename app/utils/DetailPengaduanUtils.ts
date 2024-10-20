@@ -20,14 +20,12 @@ const DetailPengaduanStore = types
                 const response = yield axiosInstance.get(
                     `${API_BASE_URL}/api/pengaduan`
                 );
-                // Filter the data based on the current user's username
                 const dataWithIndex = response.data.payload
-                    .filter((item: any) => item.nama_pelapor === currentUser?.username) // Filtering based on nama_pelapor
+                    .filter((item: any) => item.nama_pelapor === currentUser?.name) // Filtering based on nama_pelapor
                     .map((item: any, idx: any) => ({
                         ...item,
                         index: (idx + 1).toString(),
                     }));
-
                 self.detailpengaduan = dataWithIndex;
             } catch (err) {
                 self.error = "Failed to fetch complaint types";

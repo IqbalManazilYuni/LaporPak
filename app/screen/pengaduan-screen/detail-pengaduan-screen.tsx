@@ -161,7 +161,11 @@ export const DetailPengaduanScreen = observer(function DetailPengaduanScreen() {
                       width: '80%',
                       height: 30,
                       backgroundColor:
-                        data.status === 'menunggu' ? '#FF0000' : '#2E7528',
+                        data.status === 'menunggu'
+                          ? '#FF0000'
+                          : data.status === 'ditindaklanjuti'
+                            ? '#A0522D'
+                            : '#2E7528',
                       opacity: 0.53,
                       borderRadius: 5,
                       alignItems: 'center',
@@ -178,6 +182,16 @@ export const DetailPengaduanScreen = observer(function DetailPengaduanScreen() {
                             color: '#A91010',
                           }}>
                           Menunggu
+                        </Text>
+                      </>
+                    ) : data.status === 'ditindaklanjuti' ? (
+                      <>
+                        <Text
+                          style={{
+                            fontFamily: caladeaReguler,
+                            color: '#A0522D',
+                          }}>
+                          Ditindaklanjuti
                         </Text>
                       </>
                     ) : (

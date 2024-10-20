@@ -234,10 +234,8 @@ export const LoginScreen = ({}) => {
 };
 const validationSchema = Yup.object().shape({
   username: Yup.string()
-    .min(3, 'Username harus lebih dari 3 karakter!')
     .required('Username wajib diisi'),
   password: Yup.string()
-    .min(6, 'Password harus lebih dari 6 karakter!')
     .required('Password wajib diisi'),
 });
 const styles = StyleSheet.create({
