@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
   View,
@@ -15,6 +15,8 @@ import {
   BgBawahLingkaran,
   IconKeluar,
   IconLogoHome,
+  IconNotifBelum,
+  IconNotifSudah,
   IconPengaduan,
   IconPolice,
   IconProfile,
@@ -28,9 +30,20 @@ import {
   ramarajaReguler,
 } from '../../assets/fonts/FontFamily';
 import Modal from 'react-native-modal';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useIsFocused,
+  useNavigation,
+} from '@react-navigation/native';
 import {penggunaStore} from '../../utils/PenggunaUtils';
 import ModalTentang from '../../components/modal/modal-tentang/ModalTentang';
+import {useFetchDetailPengaduan} from '../../hook/tambahPengaduan';
+import Loading from '../../components/loading/Loading';
+import {useFetchSertifikat} from '../../hook/sertifikatHook';
+import {observer} from 'mobx-react-lite';
+import {sertifikatStore} from '../../utils/SertifikatUtils';
+import {detailPengaduanStore} from '../../utils/DetailPengaduanUtils';
+import Toast from 'react-native-toast-message';
 
 const {width, height} = Dimensions.get('window');
 
@@ -51,7 +64,7 @@ const menu = [
   },
   {
     title: 'Sertifikat',
-    link: 'infolaborscreen',
+    link: 'Sertifikat',
     icon: () => <IconSertifikat />,
   },
   {
@@ -63,14 +76,48 @@ const menu = [
 
 const images = [
   {id: '1', src: require('../../assets/homescreen/foto.png')},
-  {id: '2', src: require('../../assets/homescreen/foto.png')},
+  {id: '2', src: require('../../assets/homescreen/fotoo.jpeg')},
   {id: '3', src: require('../../assets/homescreen/foto.png')},
 ];
 
-export const HomeScreen: React.FC = () => {
+export const HomeScreen: React.FC = observer(function HomeScreen() {
   const {currentUser, logout} = penggunaStore;
+  const isFocused = useIsFocused();
+  const {detailPengaduanList, loading3} = useFetchDetailPengaduan();
+  const {sertifikatList, loading} = useFetchSertifikat();
   const [activeSlide, setActiveSlide] = useState(0);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [notif, setNotif] = useState(false);
+
+  useEffect(() => {
+    if (sertifikatList.length > 0) {
+      const data = sertifikatList.find(
+        item => item.status_notif === 'tersampaikan',
+      );
+      if (data) {
+        setNotif(true);
+      } else {
+        setNotif(false);
+      }
+    }
+  }, [sertifikatList]);
+
+  const handleNotifPage = () => {
+    navigation.navigate('Notifikasi');
+  };
+
+  const fetchData = async () => {
+    if (currentUser) {
+      await sertifikatStore.getDataSertifikat();
+      await detailPengaduanStore.getDataDetailPengaduan();
+    }
+  };
+
+  useEffect(() => {
+    if (currentUser) {
+      fetchData();
+    }
+  }, [isFocused, currentUser]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -86,13 +133,19 @@ export const HomeScreen: React.FC = () => {
   );
 
   const navigation = useNavigation();
-  const handleOnPress = (title: string) => {
+  const handleOnPress = async (title: string) => {
     if (title === 'Tentang') {
       setModalVisible(!isModalVisible);
     } else if (title === 'Pengaduan') {
       navigation.navigate('Pengaduan');
     } else if (title === 'Keluar') {
-      // setIsModalDelete(true);
+      await penggunaStore.logout();
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Login'}],
+      });
+    } else if (title === 'Sertifikat') {
+      navigation.navigate('Sertifikat');
     }
   };
 
@@ -106,12 +159,18 @@ export const HomeScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.backgroundScreen}>
+      {loading3 && <Loading />}
       <View style={styles.contentHeader}>
         <View style={styles.headerRow}>
           <View style={styles.logoContainer}>
             <IconLogoHome />
           </View>
           <View style={styles.profileContainer}>
+            <View style={{marginHorizontal: 10}}>
+              <TouchableOpacity onPress={() => handleNotifPage()}>
+                {notif === false ? <IconNotifSudah /> : <IconNotifBelum />}
+              </TouchableOpacity>
+            </View>
             <TouchableOpacity style={styles.profilePicture} />
           </View>
         </View>
@@ -150,7 +209,10 @@ export const HomeScreen: React.FC = () => {
             </View>
             <View style={styles.reportTextContainer}>
               <Text style={styles.reportTitle}>Lapor Pak Sumbar</Text>
-              <Text style={styles.totalReportsText}>{`Total Pengaduan :`}</Text>
+              <Text
+                style={
+                  styles.totalReportsText
+                }>{`Total Pengaduan : ${detailPengaduanList.length}`}</Text>
             </View>
             <View style={styles.bgBawahContainer}>
               <BgBawahLingkaran preserveAspectRatio="none" />
@@ -182,7 +244,7 @@ export const HomeScreen: React.FC = () => {
       />
     </SafeAreaView>
   );
-};
+});
 
 const styles = StyleSheet.create({
   backgroundScreen: {
@@ -237,7 +299,7 @@ const styles = StyleSheet.create({
   },
   paginationContainer: {
     position: 'absolute',
-    bottom:-height*0.02,
+    bottom: -height * 0.02,
     left: 0,
     right: 0,
   },

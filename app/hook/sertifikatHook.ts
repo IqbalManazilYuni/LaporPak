@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { jenisPengaduanStore } from "../utils/JenisPengaduanUtils";
+import { sertifikatStore } from "../utils/SertifikatUtils";
 import { penggunaStore } from "../utils/PenggunaUtils";
 const { currentUser, logout } = penggunaStore;
 
-export const useFetchJenisPengaduan = () => {
+export const useFetchSertifikat = () => {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -13,19 +13,19 @@ export const useFetchJenisPengaduan = () => {
                 setLoading(true);
                 setError(null);
                 try {
-                    await jenisPengaduanStore.getJenisPengaduanData();
+                    await sertifikatStore.getDataSertifikat();
                 } catch (err) {
                     setError("Failed to fetch complaint types");
                 } finally {
                     setLoading(false);
                 }
-            };
+            }
             fetchData();
         }
     }, [currentUser]);
 
     return {
-        jenisPengaduanList: jenisPengaduanStore.jenispengaduan.slice(),
+        sertifikatList: sertifikatStore.sertifikat.slice(),
         loading,
         error,
     };

@@ -38,21 +38,6 @@ import {useCreateReport} from '../../hook/tambahPengaduan';
 import {detailPengaduanStore} from '../../utils/DetailPengaduanUtils';
 
 const {width, height} = Dimensions.get('window');
-
-const data = [
-  {value: 'Kota Padang', title: 'Kota Padang'},
-  {value: 'Kota Bukittinggi', title: 'Kota Bukittinggi'},
-  {value: 'Kota Padang Panjang', title: 'Kota Padang Panjang'},
-  {value: 'Kota Payakumbuh', title: 'Kota Payakumbuh'},
-];
-
-const dataPengaduan = [
-  {value: 'Kota Padang', title: 'Kota Padang'},
-  {value: 'Kota Bukittinggi', title: 'Kota Bukittinggi'},
-  {value: 'Kota Padang Panjang', title: 'Kota Padang Panjang'},
-  {value: 'Kota Payakumbuh', title: 'Kota Payakumbuh'},
-];
-
 interface Location {
   latitude: number;
   longitude: number;
@@ -159,6 +144,8 @@ export const TambahPengaduanScreen: React.FC = observer(
                     name: 'report-photo.jpg',
                   });
                 }
+
+                console.log("ayam",formData);
 
                 await createReport(formData);
                 if (loading2 === false) {

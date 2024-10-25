@@ -3,6 +3,8 @@ import { PenggunaModel } from "../models/pengguna";
 import axios from "axios";
 import axiosInstance from "./axiosInterceptors";
 import { API_BASE_URL } from "./server";
+import { sertifikatStore } from "./SertifikatUtils";
+import { detailPengaduanStore } from "./DetailPengaduanUtils";
 
 const PenggunaStore = types
     .model("PenggunaStore", {
@@ -67,7 +69,9 @@ const PenggunaStore = types
 
         logout: () => {
             self.currentUser = null;
-            delete axiosInstance.defaults.headers.Authorization;
+            delete axiosInstance.defaults.headers.Authorization; 
+            sertifikatStore.reset();
+            detailPengaduanStore.reset();
         },
 
 

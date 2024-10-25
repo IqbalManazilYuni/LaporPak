@@ -1,7 +1,7 @@
 import { flow, types } from "mobx-state-tree";
 import { ReportModel } from "../models/pengaduan";
-import axios from "axios";
 import { API_BASE_URL } from "./server";
+import axiosInstance from "./axiosInterceptors";
 
 const ReportStore = types
     .model("ReportStore", {
@@ -14,7 +14,7 @@ const ReportStore = types
             self.loading = true;
             self.error = null;
             try {
-                const response = yield axios.post(`${API_BASE_URL}/api/pengaduan`, newReport, {
+                const response = yield axiosInstance.post(`${API_BASE_URL}/api/pengaduan`, newReport, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },

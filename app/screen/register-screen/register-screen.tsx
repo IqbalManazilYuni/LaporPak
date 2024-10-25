@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   Alert,
   Button,
@@ -31,11 +31,16 @@ import * as Yup from 'yup';
 import {useNavigation} from '@react-navigation/native';
 import {useCreatePengguna} from '../../hook/tambahPengguna';
 import Toast from 'react-native-toast-message';
+import {useFetchKabupatenKota} from '../../hook/kabupatenKotaHook';
+import Loading from '../../components/loading/Loading';
+import {Dropdown} from 'react-native-element-dropdown';
 
 export const RegisterScreen = ({}) => {
   const navigation = useNavigation();
   const {createPengguna, loading, error} = useCreatePengguna();
+  const {kabupatenKotaList, loading1} = useFetchKabupatenKota();
 
+  const [modalOpen, setModalOpen] = useState(false);
   const handleFormSubmit = async (values: any) => {
     const result = await createPengguna(values); // Panggil MobX action
     if (result?.success) {
@@ -60,6 +65,8 @@ export const RegisterScreen = ({}) => {
   return (
     <SafeAreaView style={styles.backgroundScreen}>
       <StatusBar backgroundColor={'#444444'} />
+      {loading && <Loading />}
+      {loading1 && <Loading />}
       <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false}>
         <View style={styles.contentUp}>
           <Text
@@ -133,6 +140,7 @@ export const RegisterScreen = ({}) => {
                       style={{
                         width: '98%',
                         fontFamily: caladeaReguler,
+                        fontSize: height * 0.02,
                         color: '#9CA3AF',
                       }}
                       placeholder="Nama Lengkap"
@@ -166,6 +174,7 @@ export const RegisterScreen = ({}) => {
                       style={{
                         width: '98%',
                         fontFamily: caladeaReguler,
+                        fontSize: height * 0.02,
                         color: '#9CA3AF',
                       }}
                       placeholder="Username"
@@ -199,6 +208,7 @@ export const RegisterScreen = ({}) => {
                       style={{
                         width: '98%',
                         fontFamily: caladeaReguler,
+                        fontSize: height * 0.02,
                         color: '#9CA3AF',
                       }}
                       placeholder="Password"
@@ -207,6 +217,58 @@ export const RegisterScreen = ({}) => {
                       value={values.password}
                       secureTextEntry={true}
                       placeholderTextColor={'#9CA3AF'}
+                    />
+                  </View>
+                </View>
+                <View
+                  style={{
+                    width: '80%',
+                    flexDirection: 'row',
+                    backgroundColor: '#F9FAFB',
+                    height: 45,
+                    marginTop: height * 0.025,
+                    borderWidth: 1,
+                    borderColor:
+                      touched.addres && errors.addres ? 'red' : '#D1D5DB',
+                    borderRadius: 8,
+                  }}>
+                  <View
+                    style={{
+                      width: '15%',
+                      height: '100%',
+                      alignItems: 'flex-end',
+                      justifyContent: 'center',
+                      position: 'absolute',
+                      zIndex: 1000,
+                      paddingRight: 10,
+                    }}>
+                    <IconHouse />
+                  </View>
+                  <View style={{width: '100%'}}>
+                    <Dropdown
+                      data={kabupatenKotaList.map(item => ({
+                        value: item.kabupatenkota,
+                        title: item.kabupatenkota,
+                      }))}
+                      maxHeight={250}
+                      searchPlaceholder="Search..."
+                      search
+                      value={values.addres}
+                      inputSearchStyle={styles.oNselectedTextStyle}
+                      dropdownPosition="auto"
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      onChange={item => {
+                        handleChange('addres')(item.value);
+                        setModalOpen(false);
+                      }}
+                      placeholder="Pilih Kota"
+                      labelField="title"
+                      valueField="value"
+                      style={{
+                        padding: 10,
+                        height: 45,
+                      }}
                     />
                   </View>
                 </View>
@@ -233,6 +295,7 @@ export const RegisterScreen = ({}) => {
                       style={{
                         width: '98%',
                         fontFamily: caladeaReguler,
+                        fontSize: height * 0.02,
                         color: '#9CA3AF',
                       }}
                       placeholder="Nomor Hp"
@@ -243,39 +306,7 @@ export const RegisterScreen = ({}) => {
                     />
                   </View>
                 </View>
-                <View
-                  style={[
-                    styles.contentInput,
-                    {
-                      borderColor:
-                        touched.addres && errors.addres ? 'red' : '#D1D5DB',
-                    },
-                  ]}>
-                  <View
-                    style={{
-                      width: '15%',
-                      height: '100%',
-                      alignItems: 'flex-end',
-                      justifyContent: 'center',
-                      paddingRight: 10,
-                    }}>
-                    <IconHouse />
-                  </View>
-                  <View style={{width: '85%'}}>
-                    <TextInput
-                      style={{
-                        width: '98%',
-                        fontFamily: caladeaReguler,
-                        color: '#9CA3AF',
-                      }}
-                      placeholder="Alamat Lengkap"
-                      onChangeText={handleChange('addres')}
-                      onBlur={handleBlur('addres')}
-                      value={values.addres}
-                      placeholderTextColor={'#9CA3AF'}
-                    />
-                  </View>
-                </View>
+
                 <TouchableOpacity
                   style={styles.buttonSubmit}
                   onPress={() => handleSubmit()}>
@@ -297,7 +328,7 @@ export const RegisterScreen = ({}) => {
               width: '80%',
               flexDirection: 'row',
               justifyContent: 'center',
-              marginBottom: height * 0.2,
+              marginBottom: modalOpen === true ? height * 0.6 : height * 0.2,
             }}>
             <Text
               style={{
@@ -337,6 +368,23 @@ const styles = StyleSheet.create({
   backgroundScreen: {
     backgroundColor: '#FFFFFF',
     flex: 1,
+  },
+  placeholderStyle: {
+    fontFamily: caladeaReguler,
+    color: '#9CA3AF',
+    marginLeft: width * 0.1,
+    fontSize: height * 0.02,
+  },
+  selectedTextStyle: {
+    fontFamily: caladeaReguler,
+    fontSize: height * 0.02,
+    marginLeft: width * 0.1,
+    color: '#9CA3AF',
+  },
+  oNselectedTextStyle: {
+    fontFamily: caladeaReguler,
+    fontSize: height * 0.02,
+    color: '#9CA3AF',
   },
   contentUp: {
     height: '35%',

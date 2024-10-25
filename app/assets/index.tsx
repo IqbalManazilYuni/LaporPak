@@ -26,3 +26,6 @@ export {default as IconNomorDetail} from './DetailScreen/nomor_laporan.svg';
 export {default as IconTanggalDetail} from './DetailScreen/tanggal.svg';
 export {default as IconKategoriDetail} from './DetailScreen/jenis.svg';
 export {default as IconOrangDetail} from './DetailScreen/pelapor.svg';
+export {default as IconSeru} from './sertifikatscreen/tanda-seru.svg';
+export {default as IconNotifSudah} from './homescreen/lonceng-sudah.svg';
+export {default as IconNotifBelum} from './homescreen/lonceng-belum.svg';

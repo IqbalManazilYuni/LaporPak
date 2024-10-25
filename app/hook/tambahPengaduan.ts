@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { reportStore } from "../utils/PengaduanUtils";
 import { detailPengaduanStore } from "../utils/DetailPengaduanUtils";
+import { penggunaStore } from "../utils/PenggunaUtils";
+
+const { currentUser, logout } = penggunaStore;
+
 
 export const useCreateReport = () => {
   const [error2, setError] = useState<string | null>(null);
@@ -30,19 +34,21 @@ export const useFetchDetailPengaduan = () => {
   const [loading3, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        await detailPengaduanStore.getDataDetailPengaduan();
-      } catch (err) {
-        setError("Failed to fetch complaint types");
-      } finally {
-        setLoading(false);
+    if (currentUser) {
+      const fetchData = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          await detailPengaduanStore.getDataDetailPengaduan();
+        } catch (err) {
+          setError("Failed to fetch complaint types");
+        } finally {
+          setLoading(false);
+        }
       }
+      fetchData();
     }
-    fetchData();
-  }, []);
+  }, [currentUser]);
 
   return {
     detailPengaduanList: detailPengaduanStore.detailpengaduan.slice(),

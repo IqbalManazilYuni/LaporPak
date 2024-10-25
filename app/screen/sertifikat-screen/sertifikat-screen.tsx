@@ -18,7 +18,9 @@ import {
   IconPapan,
   IconPeoplePengaduang,
   IconSeach,
+  IconSeru,
   IconSuccess,
+  IconTanggalDetail,
   IconWarning,
 } from '../../assets';
 import {
@@ -26,40 +28,40 @@ import {
   useIsFocused,
   useNavigation,
 } from '@react-navigation/native';
-import SearchComponent from '../../components/search/Search';
 import {caladeaReguler, ramarajaReguler} from '../../assets/fonts/FontFamily';
-import {useFetchDetailPengaduan} from '../../hook/tambahPengaduan';
 import {observer} from 'mobx-react-lite';
+import moment from 'moment';
+import 'moment/locale/id';
 import Loading from '../../components/loading/Loading';
-import {detailPengaduanStore} from '../../utils/DetailPengaduanUtils';
+import {useFetchSertifikat} from '../../hook/sertifikatHook';
+import {sertifikatStore} from '../../utils/SertifikatUtils';
+import Pdf from 'react-native-pdf';
 import {penggunaStore} from '../../utils/PenggunaUtils';
 
 const {width, height} = Dimensions.get('window');
 
-export const PengaduanScreen: React.FC = observer(function PengaduanScreen() {
+export const SertifikatScreen: React.FC = observer(function SertifikatScreen() {
+  const {currentUser, logout} = penggunaStore;
   const navigation = useNavigation();
   const isFocused = useIsFocused();
-  const {currentUser, logout} = penggunaStore;
-  const {detailPengaduanList, loading3} = useFetchDetailPengaduan();
-  const data = detailPengaduanList;
+  moment.locale('id');
+  const {sertifikatList, loading} = useFetchSertifikat();
+
+  const data = sertifikatList;
   const [dataFilter, setDataFilter] = useState(data);
   const [refreshing, setRefreshing] = useState(false);
 
-  const handleTambahPelaporan = () => {
-    navigation.navigate('TambahPengaduan');
-  };
-
   const fetchData = async () => {
     if (currentUser) {
-      await detailPengaduanStore.getDataDetailPengaduan();
-      setDataFilter(detailPengaduanStore.detailpengaduan);
+      await sertifikatStore.getDataSertifikat();
+      setDataFilter(sertifikatStore.sertifikat);
     }
   };
   const fetchData2 = async () => {
     if (currentUser) {
       setRefreshing(true);
-      await detailPengaduanStore.getDataDetailPengaduan();
-      setDataFilter(detailPengaduanStore.detailpengaduan);
+      await sertifikatStore.getDataSertifikat();
+      setDataFilter(sertifikatStore.sertifikat);
       setRefreshing(false);
     }
   };
@@ -72,7 +74,7 @@ export const PengaduanScreen: React.FC = observer(function PengaduanScreen() {
 
   const handleDetail = (id: any) => {
     const dataPengaduan = dataFilter.find(item => item._id === id);
-    navigation.navigate('DetailPengaduan', {
+    navigation.navigate('DetailSertifikat', {
       state: {_id: dataPengaduan?._id},
     });
   };
@@ -80,18 +82,38 @@ export const PengaduanScreen: React.FC = observer(function PengaduanScreen() {
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={'#444444'} translucent={true} />
       <Header
-        TxtMiddle="Pengaduan"
+        TxtMiddle="Sertifikat"
         ImgBack={() => <IconLeftBack />}
         onBackPress={() => navigation.goBack()}
       />
-      {loading3 && <Loading />}
-      {detailPengaduanStore.loading && <Loading />}
+      {loading && <Loading />}
+      {sertifikatStore.loading && <Loading />}
 
-      <SearchComponent
-        data={data}
-        setFiltered={setDataFilter}
-        filterKey="judul"
-      />
+      <View
+        style={{width: '100%', justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{flexDirection: 'row', width: '85%'}}>
+          <View
+            style={{
+              width: '1%',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <IconSeru />
+          </View>
+          <View
+            style={{
+              width: '95%',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              paddingLeft: 10,
+            }}>
+            <Text style={{fontFamily: caladeaReguler, color: '#444444'}}>
+              Sertifikat akan didapatkan jika kamu sebagai pelapor teraktif.
+            </Text>
+          </View>
+        </View>
+      </View>
+
       <ScrollView
         style={{flex: 1, marginTop: height * 0.02}}
         showsVerticalScrollIndicator={false}
@@ -106,88 +128,44 @@ export const PengaduanScreen: React.FC = observer(function PengaduanScreen() {
               onPress={() => handleDetail(row._id)}>
               <View style={styles.contentImage}>
                 <Image
-                  source={{uri: row.uri_foto}}
+                  source={require('../../assets/homescreen/foto2.png')}
                   style={styles.image}
                   resizeMode="cover"
                 />
               </View>
               <View style={styles.contentDeskripsi}>
-                <Text style={styles.fontJudulPengaduan}>{row.judul}</Text>
-                <View style={{flexDirection: 'row', marginBottom: 5}}>
-                  <IconPeoplePengaduang />
+                <Text style={styles.fontJudulPengaduan}>
+                  {row.nama_sertifikat}
+                </Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    marginBottom: 5,
+                    width: '100%',
+                  }}>
+                  <View style={{width: '3%'}}>
+                    <IconPeoplePengaduang />
+                  </View>
                   <Text style={styles.fontNamaPelapor}>{row.nama_pelapor}</Text>
                 </View>
-                <View style={{flexDirection: 'row', marginVertical: 5}}>
-                  <IconPapan />
-                  <Text style={styles.fontNamaPelapor}>
-                    {row.jenis_pengaduan}
-                  </Text>
-                </View>
-                <View style={{flex: 1, alignItems: 'center'}}>
-                  <View
-                    style={{
-                      width: '80%',
-                      height: 20,
-                      backgroundColor:
-                        row.status === 'menunggu'
-                          ? '#FF0000'
-                          : row.status === 'ditindaklanjuti'
-                            ? '#A0522D'
-                            : '#2E7528',
-                      opacity: 0.53,
-                      borderRadius: 5,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexDirection: 'row',
-                      marginTop: 5,
-                    }}>
-                    {row.status === 'menunggu' ? (
-                      <>
-                        <IconWarning />
-                        <Text
-                          style={{
-                            fontFamily: caladeaReguler,
-                            color: '#A91010',
-                          }}>
-                          Menunggu
-                        </Text>
-                      </>
-                    ) : row.status === 'ditindaklanjuti' ? (
-                      <>
-                        <Text
-                          style={{
-                            fontFamily: caladeaReguler,
-                            color: '#A0522D',
-                          }}>
-                          Ditindaklanjuti
-                        </Text>
-                      </>
-                    ) : (
-                      <>
-                        <IconSuccess />
-                        <Text
-                          style={{
-                            fontFamily: caladeaReguler,
-                            color: '#2E7528',
-                          }}>
-                          Selesai
-                        </Text>
-                      </>
-                    )}
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    marginVertical: 5,
+                    width: '100%',
+                  }}>
+                  <View style={{width: '3%'}}>
+                    <IconTanggalDetail />
                   </View>
+                  <Text style={styles.fontNamaPelapor}>
+                    {moment(row.createdAt).format('D MMMM YYYY')}
+                  </Text>
                 </View>
               </View>
             </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
-      <View style={styles.contentAdd}>
-        <TouchableOpacity
-          style={styles.buttonAdd}
-          onPress={() => handleTambahPelaporan()}>
-          <IconAdd preserveAspectRatio="none" height={'30%'} width={'30%'} />
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 });
@@ -247,7 +225,7 @@ const styles = StyleSheet.create({
   fontJudulPengaduan: {
     fontFamily: ramarajaReguler,
     color: '#374151',
-    fontSize: height * 0.026,
+    fontSize: height * 0.024,
     marginTop: 5,
   },
   fontNamaPelapor: {
