@@ -9,4 +9,5 @@ export const PenggunaModel = types.model("Pengguna", {
     addres: types.maybeNull(types.string),
     token: types.maybeNull(types.string),
     role: types.maybeNull(types.string),
+    uri_profle: types.maybeNull(types.string)
 });

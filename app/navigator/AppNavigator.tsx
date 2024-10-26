@@ -9,7 +9,8 @@ import {TambahPengaduanScreen} from '../screen/pengaduan-screen/tambah-pengaduan
 import {DetailPengaduanScreen} from '../screen/pengaduan-screen/detail-pengaduan-screen';
 import {SertifikatScreen} from '../screen/sertifikat-screen/sertifikat-screen';
 import {DetailSertifikatScreen} from '../screen/sertifikat-screen/detail-sertifikat-screen';
-import { NotifikasiScreen } from '../screen/notifikasi-screen/notifikasi-screent';
+import {NotifikasiScreen} from '../screen/notifikasi-screen/notifikasi-screent';
+import {ProfileScreen} from '../screen/profile-screen/profile-screent';
 
 type RootStackParamList = {
   Home: undefined;
@@ -22,6 +23,7 @@ type RootStackParamList = {
   Sertifikat: undefined;
   DetailSertifikat: undefined;
   Notifikasi: undefined;
+  Profile: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -40,6 +42,7 @@ const AppNavigator: React.FC = () => {
       <Stack.Screen name="DetailPengaduan" component={DetailPengaduanScreen} />
       <Stack.Screen name="Sertifikat" component={SertifikatScreen} />
       <Stack.Screen name="Notifikasi" component={NotifikasiScreen} />
+      <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen
         name="DetailSertifikat"
         component={DetailSertifikatScreen}

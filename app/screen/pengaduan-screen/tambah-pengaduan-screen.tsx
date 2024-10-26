@@ -144,9 +144,6 @@ export const TambahPengaduanScreen: React.FC = observer(
                     name: 'report-photo.jpg',
                   });
                 }
-
-                console.log("ayam",formData);
-
                 await createReport(formData);
                 if (loading2 === false) {
                   detailPengaduanStore.getDataDetailPengaduan();

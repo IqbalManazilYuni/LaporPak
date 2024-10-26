@@ -55,7 +55,7 @@ const menu = [
   },
   {
     title: 'Profile',
-    link: 'pesertascreen',
+    link: 'Profile',
     icon: () => <IconProfile />,
   },
   {
@@ -133,11 +133,11 @@ export const HomeScreen: React.FC = observer(function HomeScreen() {
   );
 
   const navigation = useNavigation();
-  const handleOnPress = async (title: string) => {
+  const handleOnPress = async (title: string, link: string | undefined) => {
     if (title === 'Tentang') {
       setModalVisible(!isModalVisible);
     } else if (title === 'Pengaduan') {
-      navigation.navigate('Pengaduan');
+      navigation.navigate(link);
     } else if (title === 'Keluar') {
       await penggunaStore.logout();
       navigation.reset({
@@ -145,14 +145,20 @@ export const HomeScreen: React.FC = observer(function HomeScreen() {
         routes: [{name: 'Login'}],
       });
     } else if (title === 'Sertifikat') {
-      navigation.navigate('Sertifikat');
+      navigation.navigate(link);
+    } else if (title === 'Profile') {
+      navigation.navigate(link);
     }
   };
 
   const _renderItem = ({item}: {item: {src: any}}) => {
     return (
       <View style={styles.imageContainer}>
-        <Image source={item.src} style={styles.image} resizeMode="cover" />
+        <Image
+          source={item.src}
+          style={[styles.image, {borderRadius: 16}]}
+          resizeMode="cover"
+        />
       </View>
     );
   };
@@ -171,7 +177,23 @@ export const HomeScreen: React.FC = observer(function HomeScreen() {
                 {notif === false ? <IconNotifSudah /> : <IconNotifBelum />}
               </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.profilePicture} />
+            <TouchableOpacity
+              style={styles.profilePicture}
+              onPress={() => navigation.navigate('Profile')}>
+              {currentUser?.uri_profle ? (
+                <Image
+                  source={{uri: currentUser?.uri_profle}}
+                  style={styles.image}
+                  resizeMode="cover"
+                />
+              ) : (
+                <Image
+                  source={require('../../assets/boy.png')}
+                  resizeMode="cover"
+                  style={styles.image}
+                />
+              )}
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -229,7 +251,7 @@ export const HomeScreen: React.FC = observer(function HomeScreen() {
               <View key={rowIndex} style={styles.menuItemContainer}>
                 <TouchableOpacity
                   style={styles.menuItemButton}
-                  onPress={() => handleOnPress(row.title)}>
+                  onPress={() => handleOnPress(row.title, row.link)}>
                   <row.icon />
                 </TouchableOpacity>
                 <Text style={styles.menuItemText}>{row.title}</Text>
@@ -276,6 +298,7 @@ const styles = StyleSheet.create({
     borderRadius: (height * 0.05) / 2,
     backgroundColor: 'white',
     elevation: 5,
+    overflow: 'hidden',
   },
   contentImage: {
     height: '44%',
@@ -292,7 +315,6 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
-    borderRadius: 16,
   },
   carouselContainer: {
     height: '65%',
@@ -352,8 +374,8 @@ const styles = StyleSheet.create({
   },
   totalReportsText: {
     fontFamily: ramarajaReguler,
-    color: '#EBC730',
-    fontSize: height * 0.025,
+    color: '#D79A0F',
+    fontSize: height * 0.022,
   },
   bgBawahContainer: {
     width: '30%',

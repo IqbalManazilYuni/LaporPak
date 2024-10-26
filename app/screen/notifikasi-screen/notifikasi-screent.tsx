@@ -14,6 +14,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {Header} from '../../components/header/Header';
 import {
   IconAdd,
+  IconEmpty,
   IconLeftBack,
   IconPapan,
   IconPeoplePengaduang,
@@ -150,23 +151,55 @@ export const NotifikasiScreen: React.FC = observer(function NotifikasiScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={fetchData2} />
         }>
         <View style={styles.contentCard}>
-          {dataFilter.map((row, rowIndex) => (
-            <View key={rowIndex} style={styles.card}>
-              <View style={styles.contentDeskripsi}>
-                <Text style={styles.fontJudulPengaduan}>
-                  Kamu Menerima Sertifikat dari Satpol PP Sumbar
-                </Text>
-                <Text style={styles.fontNamaPelapor}>
-                  Cek pada menu Sertifikat pada Home aplikasi
-                </Text>
-              </View>
-              <View style={styles.contentDeskripsiS}>
-                <Text style={styles.fontNamaPelapor}>
-                  {getRelativeTime(row.createdAt)}
-                </Text>
-              </View>
+          {dataFilter.length > 0 ? (
+            <>
+              {dataFilter.map((row, rowIndex) => (
+                <View key={rowIndex} style={styles.card}>
+                  <View style={styles.contentDeskripsi}>
+                    <Text style={styles.fontJudulPengaduan}>
+                      Kamu Menerima Sertifikat dari Satpol PP Sumbar
+                    </Text>
+                    <Text style={styles.fontNamaPelapor}>
+                      Cek pada menu Sertifikat pada Home aplikasi
+                    </Text>
+                  </View>
+                  <View style={styles.contentDeskripsiS}>
+                    <Text style={styles.fontNamaPelapor}>
+                      {getRelativeTime(row.createdAt)}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </>
+          ) : (
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                // height: height,
+                marginTop: height * 0.2,
+                flexDirection: 'column',
+              }}>
+              <IconEmpty />
+              <Text
+                style={{
+                  fontFamily: caladeaBold,
+                  color: 'black',
+                  fontSize: height * 0.02,
+                }}>
+                Data Tidak Ada
+              </Text>
+              <Text
+                style={{
+                  fontFamily: caladeaReguler,
+                  color: 'black',
+                  fontSize: height * 0.017,
+                  marginTop: 2,
+                }}>
+                Tidak Ada Data yang Ditampilkan
+              </Text>
             </View>
-          ))}
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

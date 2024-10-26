@@ -14,6 +14,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {Header} from '../../components/header/Header';
 import {
   IconAdd,
+  IconEmpty,
   IconLeftBack,
   IconPapan,
   IconPeoplePengaduang,
@@ -28,7 +29,11 @@ import {
   useIsFocused,
   useNavigation,
 } from '@react-navigation/native';
-import {caladeaReguler, ramarajaReguler} from '../../assets/fonts/FontFamily';
+import {
+  caladeaBold,
+  caladeaReguler,
+  ramarajaReguler,
+} from '../../assets/fonts/FontFamily';
 import {observer} from 'mobx-react-lite';
 import moment from 'moment';
 import 'moment/locale/id';
@@ -121,49 +126,84 @@ export const SertifikatScreen: React.FC = observer(function SertifikatScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={fetchData2} />
         }>
         <View style={styles.contentCard}>
-          {dataFilter.map((row, rowIndex) => (
-            <TouchableOpacity
-              key={rowIndex}
-              style={styles.card}
-              onPress={() => handleDetail(row._id)}>
-              <View style={styles.contentImage}>
-                <Image
-                  source={require('../../assets/homescreen/foto2.png')}
-                  style={styles.image}
-                  resizeMode="cover"
-                />
-              </View>
-              <View style={styles.contentDeskripsi}>
-                <Text style={styles.fontJudulPengaduan}>
-                  {row.nama_sertifikat}
-                </Text>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    marginBottom: 5,
-                    width: '100%',
-                  }}>
-                  <View style={{width: '3%'}}>
-                    <IconPeoplePengaduang />
+          {dataFilter.length > 0 ? (
+            <>
+              {dataFilter.map((row, rowIndex) => (
+                <TouchableOpacity
+                  key={rowIndex}
+                  style={styles.card}
+                  onPress={() => handleDetail(row._id)}>
+                  <View style={styles.contentImage}>
+                    <Image
+                      source={require('../../assets/homescreen/foto2.png')}
+                      style={styles.image}
+                      resizeMode="cover"
+                    />
                   </View>
-                  <Text style={styles.fontNamaPelapor}>{row.nama_pelapor}</Text>
-                </View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    marginVertical: 5,
-                    width: '100%',
-                  }}>
-                  <View style={{width: '3%'}}>
-                    <IconTanggalDetail />
+                  <View style={styles.contentDeskripsi}>
+                    <Text style={styles.fontJudulPengaduan}>
+                      {row.nama_sertifikat}
+                    </Text>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        marginBottom: 5,
+                        width: '100%',
+                      }}>
+                      <View style={{width: '3%'}}>
+                        <IconPeoplePengaduang />
+                      </View>
+                      <Text style={styles.fontNamaPelapor}>
+                        {row.nama_pelapor}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        marginVertical: 5,
+                        width: '100%',
+                      }}>
+                      <View style={{width: '3%'}}>
+                        <IconTanggalDetail />
+                      </View>
+                      <Text style={styles.fontNamaPelapor}>
+                        {moment(row.createdAt).format('D MMMM YYYY')}
+                      </Text>
+                    </View>
                   </View>
-                  <Text style={styles.fontNamaPelapor}>
-                    {moment(row.createdAt).format('D MMMM YYYY')}
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
+                </TouchableOpacity>
+              ))}
+            </>
+          ) : (
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                // height: height,
+                marginTop:height*0.2,
+                flexDirection: 'column',
+              }}>
+
+              <IconEmpty />
+              <Text
+                style={{
+                  fontFamily: caladeaBold,
+                  color: 'black',
+                  fontSize: height * 0.02,
+                }}>
+                Data Tidak Ada
+              </Text>
+              <Text
+                style={{
+                  fontFamily: caladeaReguler,
+                  color: 'black',
+                  fontSize: height * 0.017,
+                  marginTop: 2,
+                }}>
+                Tidak Ada Data yang Ditampilkan
+              </Text>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -176,6 +216,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentCard: {
+    flex: 1,
     width: '100%',
     alignItems: 'center',
   },
