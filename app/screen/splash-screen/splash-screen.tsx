@@ -16,7 +16,7 @@ export const SplashScreen: React.FC = () => {
       navigation.navigate('Login');
     }, 3000);
 
-    return () => clearTimeout(timer); // Cleanup the timer on unmount
+    return () => clearTimeout(timer);
   }, [navigation]);
 
   return (
