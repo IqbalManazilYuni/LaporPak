@@ -23,60 +23,59 @@ import {
   IconWarning,
 } from '../../assets';
 import {
+  NavigationProp,
   useFocusEffect,
   useIsFocused,
   useNavigation,
+  useRoute,
 } from '@react-navigation/native';
 import SearchComponent from '../../components/search/Search';
-import {caladeaBold, caladeaReguler, ramarajaReguler} from '../../assets/fonts/FontFamily';
+import {
+  caladeaBold,
+  caladeaReguler,
+  ramarajaReguler,
+} from '../../assets/fonts/FontFamily';
 import {useFetchDetailPengaduan} from '../../hook/tambahPengaduan';
 import {observer} from 'mobx-react-lite';
 import Loading from '../../components/loading/Loading';
 import {detailPengaduanStore} from '../../utils/DetailPengaduanUtils';
 import {penggunaStore} from '../../utils/PenggunaUtils';
+import useFetchJumlahPengaduan from '../../hook/fetchPengaduan';
+import {PesanError} from '../../components/errot';
+import {RootStackParamList} from '../../navigator/AppNavigator';
+import useFetchUserByToken from '../../hook/fetchByToken';
 
 const {width, height} = Dimensions.get('window');
 
 export const PengaduanScreen: React.FC = observer(function PengaduanScreen() {
-  const navigation = useNavigation();
-  const isFocused = useIsFocused();
-  const {currentUser} = penggunaStore;
-  const {detailPengaduanList, loading3} = useFetchDetailPengaduan();
-  const data = detailPengaduanList;
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const {userData, loading, error} = useFetchUserByToken();
+  const {data, loading1, error1, refetch} = useFetchJumlahPengaduan({
+    name: userData?.name,
+  });
   const [dataFilter, setDataFilter] = useState(data);
   const [refreshing, setRefreshing] = useState(false);
 
+  useEffect(() => {
+    setDataFilter(data);
+  }, [data]);
   const handleTambahPelaporan = () => {
     navigation.navigate('TambahPengaduan');
   };
 
-  const fetchData = async () => {
-    if (currentUser) {
-      await detailPengaduanStore.getDataDetailPengaduan();
-      setDataFilter(detailPengaduanStore.detailpengaduan);
-    }
-  };
   const fetchData2 = async () => {
-    if (currentUser) {
-      setRefreshing(true);
-      await detailPengaduanStore.getDataDetailPengaduan();
-      setDataFilter(detailPengaduanStore.detailpengaduan);
-      setRefreshing(false);
-    }
+    setRefreshing(true);
+    await refetch(); // Panggil refetch dari hook useFetchJumlahPengaduan
+    setDataFilter(data); // Perbarui state setelah data berhasil diambil
+    setRefreshing(false);
   };
-
-  useEffect(() => {
-    if (currentUser) {
-      fetchData();
-    }
-  }, [isFocused, currentUser]);
-
   const handleDetail = (id: any) => {
     const dataPengaduan = dataFilter.find(item => item._id === id);
     navigation.navigate('DetailPengaduan', {
-      state: {_id: dataPengaduan?._id},
+      dataPengaduan,
     });
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={'#444444'} translucent={true} />
@@ -85,8 +84,10 @@ export const PengaduanScreen: React.FC = observer(function PengaduanScreen() {
         ImgBack={() => <IconLeftBack />}
         onBackPress={() => navigation.goBack()}
       />
-      {loading3 && <Loading />}
-      {detailPengaduanStore.loading && <Loading />}
+      {loading1 && <Loading />}
+      {error1 && <PesanError text={error1} />}
+      {loading && <Loading />}
+      {error && <PesanError text={error} />}
 
       <SearchComponent
         data={data}

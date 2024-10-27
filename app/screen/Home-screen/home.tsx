@@ -7,7 +7,6 @@ import {
   Image,
   Text,
   TouchableOpacity,
-  Button,
   BackHandler,
 } from 'react-native';
 import {
@@ -24,26 +23,22 @@ import {
   IconTentang,
 } from '../../assets';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
+import {ramarajaReguler} from '../../assets/fonts/FontFamily';
 import {
-  caladeaBold,
-  caladeaReguler,
-  ramarajaReguler,
-} from '../../assets/fonts/FontFamily';
-import Modal from 'react-native-modal';
-import {
+  NavigationProp,
   useFocusEffect,
   useIsFocused,
   useNavigation,
 } from '@react-navigation/native';
 import {penggunaStore} from '../../utils/PenggunaUtils';
 import ModalTentang from '../../components/modal/modal-tentang/ModalTentang';
-import {useFetchDetailPengaduan} from '../../hook/tambahPengaduan';
 import Loading from '../../components/loading/Loading';
-import {useFetchSertifikat} from '../../hook/sertifikatHook';
 import {observer} from 'mobx-react-lite';
-import {sertifikatStore} from '../../utils/SertifikatUtils';
-import {detailPengaduanStore} from '../../utils/DetailPengaduanUtils';
-import Toast from 'react-native-toast-message';
+import useFetchUserByToken from '../../hook/fetchByToken';
+import {PesanError} from '../../components/errot';
+import useFetchJumlahPengaduan from '../../hook/fetchPengaduan';
+import {RootStackParamList} from '../../navigator/AppNavigator';
+import useFetchSertifikat from '../../hook/fetchSertifikat';
 
 const {width, height} = Dimensions.get('window');
 
@@ -81,43 +76,41 @@ const images = [
 ];
 
 export const HomeScreen: React.FC = observer(function HomeScreen() {
-  const {currentUser, logout} = penggunaStore;
+  const {userData, loading, error} = useFetchUserByToken();
+  const {data, loading1, error1} = useFetchJumlahPengaduan({
+    name: userData?.name,
+  });
+  const {dataSertifikat, loading7, error7} = useFetchSertifikat({
+    name: userData?.name,
+  });
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const isFocused = useIsFocused();
-  const {detailPengaduanList, loading3} = useFetchDetailPengaduan();
-  const {sertifikatList, loading} = useFetchSertifikat();
   const [activeSlide, setActiveSlide] = useState(0);
   const [isModalVisible, setModalVisible] = useState(false);
   const [notif, setNotif] = useState(false);
 
   useEffect(() => {
-    if (sertifikatList.length > 0) {
-      const data = sertifikatList.find(
-        item => item.status_notif === 'tersampaikan',
-      );
-      if (data) {
-        setNotif(true);
-      } else {
-        setNotif(false);
+    if (isFocused) {
+      if (dataSertifikat.length > 0) {
+        const data = dataSertifikat.find(
+          item => item.status_notif === 'tersampaikan',
+        );
+        if (data) {
+          setNotif(true);
+        } else {
+          setNotif(false);
+        }
       }
     }
-  }, [sertifikatList]);
+  }, [isFocused, dataSertifikat]);
 
   const handleNotifPage = () => {
     navigation.navigate('Notifikasi');
   };
 
-  const fetchData = async () => {
-    if (currentUser) {
-      await sertifikatStore.getDataSertifikat();
-      await detailPengaduanStore.getDataDetailPengaduan();
-    }
+  const closeModal = () => {
+    setModalVisible(false);
   };
-
-  useEffect(() => {
-    if (currentUser) {
-      fetchData();
-    }
-  }, [isFocused, currentUser]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -132,12 +125,11 @@ export const HomeScreen: React.FC = observer(function HomeScreen() {
     }, []),
   );
 
-  const navigation = useNavigation();
-  const handleOnPress = async (title: string, link: string | undefined) => {
+  const handleOnPress = async (title: string) => {
     if (title === 'Tentang') {
       setModalVisible(!isModalVisible);
     } else if (title === 'Pengaduan') {
-      navigation.navigate(link);
+      navigation.navigate('Pengaduan');
     } else if (title === 'Keluar') {
       await penggunaStore.logout();
       navigation.reset({
@@ -145,9 +137,9 @@ export const HomeScreen: React.FC = observer(function HomeScreen() {
         routes: [{name: 'Login'}],
       });
     } else if (title === 'Sertifikat') {
-      navigation.navigate(link);
+      navigation.navigate('Sertifikat');
     } else if (title === 'Profile') {
-      navigation.navigate(link);
+      navigation.navigate('Profile');
     }
   };
 
@@ -162,10 +154,14 @@ export const HomeScreen: React.FC = observer(function HomeScreen() {
       </View>
     );
   };
-
   return (
     <SafeAreaView style={styles.backgroundScreen}>
-      {loading3 && <Loading />}
+      {loading && <Loading />}
+      {loading1 && <Loading />}
+      {error && <PesanError text={error} />}
+      {loading7 && <Loading />}
+      {error7 && <PesanError text={error7} />}
+      {error1 && <PesanError text={error1} />}
       <View style={styles.contentHeader}>
         <View style={styles.headerRow}>
           <View style={styles.logoContainer}>
@@ -180,9 +176,9 @@ export const HomeScreen: React.FC = observer(function HomeScreen() {
             <TouchableOpacity
               style={styles.profilePicture}
               onPress={() => navigation.navigate('Profile')}>
-              {currentUser?.uri_profle ? (
+              {userData?.uri_profle ? (
                 <Image
-                  source={{uri: currentUser?.uri_profle}}
+                  source={{uri: userData?.uri_profle}}
                   style={styles.image}
                   resizeMode="cover"
                 />
@@ -234,7 +230,7 @@ export const HomeScreen: React.FC = observer(function HomeScreen() {
               <Text
                 style={
                   styles.totalReportsText
-                }>{`Total Pengaduan : ${detailPengaduanList.length}`}</Text>
+                }>{`Total Pengaduan : ${data.length}`}</Text>
             </View>
             <View style={styles.bgBawahContainer}>
               <BgBawahLingkaran preserveAspectRatio="none" />
@@ -251,7 +247,7 @@ export const HomeScreen: React.FC = observer(function HomeScreen() {
               <View key={rowIndex} style={styles.menuItemContainer}>
                 <TouchableOpacity
                   style={styles.menuItemButton}
-                  onPress={() => handleOnPress(row.title, row.link)}>
+                  onPress={() => handleOnPress(row.title)}>
                   <row.icon />
                 </TouchableOpacity>
                 <Text style={styles.menuItemText}>{row.title}</Text>
@@ -260,10 +256,7 @@ export const HomeScreen: React.FC = observer(function HomeScreen() {
           </View>
         </View>
       </View>
-      <ModalTentang
-        isOpen={isModalVisible}
-        onClose={() => setModalVisible(false)}
-      />
+      <ModalTentang isOpen={isModalVisible} onClose={closeModal} />
     </SafeAreaView>
   );
 });

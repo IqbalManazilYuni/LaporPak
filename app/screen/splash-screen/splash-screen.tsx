@@ -2,9 +2,10 @@ import {useNavigation, NavigationProp} from '@react-navigation/native';
 import React, {useEffect} from 'react';
 import {Dimensions, StatusBar, StyleSheet, Text, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {RootStackParamList} from '../../navigator/AppNavigator'; // Import the RootStackParamList
+import {RootStackParamList} from '../../navigator/AppNavigator';
 import {LOGO, LOGOBAWAH} from '../../assets';
-import {caladeaReguler, ramarajaReguler} from '../../assets/fonts/FontFamily';
+import {caladeaReguler} from '../../assets/fonts/FontFamily';
+import {isLoggedIn} from '../../utils/auth'; // Pastikan untuk mengimpor isLoggedIn
 
 const {width, height} = Dimensions.get('window');
 
@@ -12,16 +13,18 @@ export const SplashScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      navigation.navigate('Login');
-    }, 3000);
+    const checkLoginStatus = async () => {
+      navigation.navigate('Login'); // Navigasi berdasarkan status login
+    };
+
+    const timer = setTimeout(checkLoginStatus, 3000); // Tunggu 3 detik sebelum memeriksa status
 
     return () => clearTimeout(timer);
   }, [navigation]);
 
   return (
     <SafeAreaView style={styles.backgroundScreen}>
-      <StatusBar backgroundColor={"#444444"}/>
+      <StatusBar backgroundColor={'#444444'} />
       <View style={styles.contentUp}>
         <View
           style={{

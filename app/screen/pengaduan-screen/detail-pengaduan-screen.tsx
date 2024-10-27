@@ -7,9 +7,9 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableOpacity, // Import TouchableOpacity for clicking the image
+  TouchableOpacity,
   Modal,
-  Linking, // Import Modal for preview
+  Linking,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Header} from '../../components/header/Header';
@@ -24,41 +24,25 @@ import {
 } from '../../assets';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {observer} from 'mobx-react-lite';
-import {useFetchDetailPengaduan} from '../../hook/tambahPengaduan';
-import Loading from '../../components/loading/Loading';
 import {caladeaReguler, ramarajaReguler} from '../../assets/fonts/FontFamily';
 
-const {width, height} = Dimensions.get('window');
+const {height} = Dimensions.get('window');
 
 export const DetailPengaduanScreen = observer(function DetailPengaduanScreen() {
   const route = useRoute();
-  const {detailPengaduanList, loading3} = useFetchDetailPengaduan();
-  const [data, setData] = useState<any | null>(null);
-  const {_id} = route.params.state;
-
-  // State for managing the image preview modal
+  const {dataPengaduan} = route.params as {dataPengaduan: any};
   const [isModalVisible, setIsModalVisible] = useState(false);
-
-  useEffect(() => {
-    if (detailPengaduanList.length > 0) {
-      const filteredData = detailPengaduanList.find(item => item._id === _id);
-      setData(filteredData || null);
-    }
-  }, [detailPengaduanList, _id]);
-
   const navigation = useNavigation();
-
-  // Function to open and close modal
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
   };
 
   const openGoogleMaps = () => {
-    if (data?.lokasi) {
+    if (dataPengaduan?.lokasi) {
       try {
-        const {latitude, longitude} = JSON.parse(data.lokasi); // Parse lokasi JSON string
+        const {latitude, longitude} = JSON.parse(dataPengaduan.lokasi);
         const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-        Linking.openURL(url); // Buka Google Maps dengan URL
+        Linking.openURL(url);
       } catch (error) {
         console.error('Invalid lokasi format:', error);
       }
@@ -75,55 +59,53 @@ export const DetailPengaduanScreen = observer(function DetailPengaduanScreen() {
         ImgBack={() => <IconLeftBack />}
         onBackPress={() => navigation.goBack()}
       />
-      {loading3 && <Loading />}
       <ScrollView
         style={styles.containerContent}
         contentContainerStyle={{paddingBottom: height * 0.05}}
         showsVerticalScrollIndicator={false}>
         <View>
-          {data ? (
+          {dataPengaduan ? (
             <>
-              {/* Image with TouchableOpacity for click handling */}
               <TouchableOpacity onPress={toggleModal}>
                 <Image
-                  source={{uri: data.uri_foto}}
+                  source={{uri: dataPengaduan.uri_foto}}
                   style={styles.image}
                   resizeMode="cover"
                 />
               </TouchableOpacity>
 
               <View style={styles.contentDeskripsi}>
-                <Text style={styles.fontTebal}>{data.judul}</Text>
+                <Text style={styles.fontTebal}>{dataPengaduan.judul}</Text>
                 <Text style={[styles.fontKecil, {marginVertical: 0}]}>
-                  {data.deskripsi}
+                  {dataPengaduan.deskripsi}
                 </Text>
                 <Text style={styles.fontTebal}>Detail Laporan</Text>
                 <Text style={styles.fontKecil}>Nomor Laporan</Text>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <IconNomorDetail />
                   <Text style={[styles.fontKecil, {marginLeft: 5}]}>
-                    {data.index}
+                    {dataPengaduan.index}
                   </Text>
                 </View>
                 <Text style={styles.fontKecil}>Tanggal Masuk</Text>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <IconTanggalDetail />
                   <Text style={[styles.fontKecil, {marginLeft: 5}]}>
-                    {data.tanggal}
+                    {dataPengaduan.tanggal}
                   </Text>
                 </View>
                 <Text style={styles.fontKecil}>Kategori</Text>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <IconKategoriDetail />
                   <Text style={[styles.fontKecil, {marginLeft: 5}]}>
-                    {data.jenis_pengaduan}
+                    {dataPengaduan.jenis_pengaduan}
                   </Text>
                 </View>
                 <Text style={styles.fontKecil}>Nama Pelapor</Text>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <IconOrangDetail />
                   <Text style={[styles.fontKecil, {marginLeft: 5}]}>
-                    {data.nama_pelapor}
+                    {dataPengaduan.nama_pelapor}
                   </Text>
                 </View>
                 <Text style={styles.fontKecil}>Lokasi yang Dilaporkan</Text>
@@ -154,16 +136,16 @@ export const DetailPengaduanScreen = observer(function DetailPengaduanScreen() {
                 <Text
                   style={
                     styles.fontKecil
-                  }>{`Laporan Diterima Oleh : ${data.petugas}`}</Text>
+                  }>{`Laporan Diterima Oleh : ${dataPengaduan.petugas}`}</Text>
                 <View style={{flex: 1, alignItems: 'center'}}>
                   <View
                     style={{
                       width: '80%',
                       height: 30,
                       backgroundColor:
-                        data.status === 'menunggu'
+                        dataPengaduan.status === 'menunggu'
                           ? '#FF0000'
-                          : data.status === 'ditindaklanjuti'
+                          : dataPengaduan.status === 'ditindaklanjuti'
                             ? '#A0522D'
                             : '#2E7528',
                       opacity: 0.53,
@@ -173,7 +155,7 @@ export const DetailPengaduanScreen = observer(function DetailPengaduanScreen() {
                       flexDirection: 'row',
                       marginVertical: height * 0.02,
                     }}>
-                    {data.status === 'menunggu' ? (
+                    {dataPengaduan.status === 'menunggu' ? (
                       <>
                         <IconWarning />
                         <Text
@@ -184,7 +166,7 @@ export const DetailPengaduanScreen = observer(function DetailPengaduanScreen() {
                           Menunggu
                         </Text>
                       </>
-                    ) : data.status === 'ditindaklanjuti' ? (
+                    ) : dataPengaduan.status === 'ditindaklanjuti' ? (
                       <>
                         <Text
                           style={{
@@ -216,7 +198,6 @@ export const DetailPengaduanScreen = observer(function DetailPengaduanScreen() {
         </View>
       </ScrollView>
 
-      {/* Modal for Image Preview */}
       <Modal visible={isModalVisible} transparent={true}>
         <View style={styles.modalContainer}>
           <TouchableOpacity
@@ -225,7 +206,7 @@ export const DetailPengaduanScreen = observer(function DetailPengaduanScreen() {
             <Text style={styles.modalCloseText}>Tutup</Text>
           </TouchableOpacity>
           <Image
-            source={{uri: data?.uri_foto}}
+            source={{uri: dataPengaduan?.uri_foto}}
             style={styles.modalImage}
             resizeMode="contain"
           />

@@ -40,7 +40,6 @@ import 'moment/locale/id';
 import Loading from '../../components/loading/Loading';
 import {useFetchSertifikat} from '../../hook/sertifikatHook';
 import {sertifikatStore} from '../../utils/SertifikatUtils';
-import Pdf from 'react-native-pdf';
 import {penggunaStore} from '../../utils/PenggunaUtils';
 
 const {width, height} = Dimensions.get('window');

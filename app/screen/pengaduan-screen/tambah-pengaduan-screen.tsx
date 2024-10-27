@@ -16,7 +16,7 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Header} from '../../components/header/Header';
 import {IconLeftBack} from '../../assets';
-import {useNavigation} from '@react-navigation/native';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import moment from 'moment';
 import 'moment/locale/id';
 import {caladeaBold, caladeaReguler} from '../../assets/fonts/FontFamily';
@@ -24,18 +24,20 @@ import {Formik} from 'formik';
 import * as Yup from 'yup';
 import {Dropdown} from 'react-native-element-dropdown';
 import Geolocation from 'react-native-geolocation-service';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import {penggunaStore} from '../../utils/PenggunaUtils';
-import {useFetchJenisPengaduan} from '../../hook/jenisPengaduanHook';
+import {launchCamera} from 'react-native-image-picker';
 import {observer} from 'mobx-react-lite';
-import {useFetchKabupatenKota} from '../../hook/kabupatenKotaHook';
 import Loading from '../../components/loading/Loading';
 import {
   requestCameraPermission,
   requestLocationPermission,
 } from '../../utils/requestpermisions';
-import {useCreateReport} from '../../hook/tambahPengaduan';
 import {detailPengaduanStore} from '../../utils/DetailPengaduanUtils';
+import useJenisPengaduan from '../../hook/fetchJenisPengaduan';
+import {PesanError} from '../../components/errot';
+import useKabupateKota from '../../hook/fetchKabupateKota';
+import useFetchUserByToken from '../../hook/fetchByToken';
+import usePostPengaduan from '../../hook/createPengaduanHook';
+import { RootStackParamList } from '../../navigator/AppNavigator';
 
 const {width, height} = Dimensions.get('window');
 interface Location {
@@ -45,11 +47,11 @@ interface Location {
 
 export const TambahPengaduanScreen: React.FC = observer(
   function TambahPengaduanScreen() {
-    const navigation = useNavigation();
-    const {jenisPengaduanList, loading} = useFetchJenisPengaduan();
-    const {kabupatenKotaList, loading1} = useFetchKabupatenKota();
-    const {createReport, loading2} = useCreateReport();
-    const {currentUser} = penggunaStore;
+    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const {jenisPengaduan, loading4, error4} = useJenisPengaduan();
+    const {KabupatenKotaList, loading5, error5} = useKabupateKota();
+    const {postPengaduan, loading6, error6} = usePostPengaduan();
+    const {userData, loading, error} = useFetchUserByToken();
     const [location, setLocation] = useState<Location | null>(null);
     const [imageUri, setImageUri] = useState<string | null>(null);
     moment.locale('id');
@@ -74,7 +76,6 @@ export const TambahPengaduanScreen: React.FC = observer(
           mediaType: 'photo',
           cameraType: 'back',
         };
-
         launchCamera(options, response => {
           if (response.didCancel) {
             Alert.alert('User cancelled image picker');
@@ -103,15 +104,20 @@ export const TambahPengaduanScreen: React.FC = observer(
           ImgBack={() => <IconLeftBack />}
           onBackPress={() => navigation.goBack()}
         />
+        {loading4 && <Loading />}
+        {error4 && <PesanError text={error4} />}
         {loading && <Loading />}
-        {loading1 && <Loading />}
-
+        {error && <PesanError text={error} />}
+        {loading5 && <Loading />}
+        {error5 && <PesanError text={error5} />}
+        {loading6 && <Loading />}
+        {error6 && <PesanError text={error6} />}
         <ScrollView
           style={styles.contentForm}
           showsVerticalScrollIndicator={false}>
           <View style={{paddingTop: 15}}>
             <Text style={styles.fontTitle}>Nama Pelapor</Text>
-            <Text style={styles.fontSubtitle}>{currentUser?.name}</Text>
+            <Text style={styles.fontSubtitle}>{userData?.name}</Text>
             <Text style={styles.fontTitle}>Tanggal Pelaporan</Text>
             <Text style={styles.fontSubtitle}>{formattedDate}</Text>
             <Text style={styles.fontTitle}>Lokasi Pelaporan</Text>
@@ -131,7 +137,7 @@ export const TambahPengaduanScreen: React.FC = observer(
               onSubmit={async values => {
                 const formData = new FormData();
                 formData.append('tanggal', formattedDate);
-                formData.append('pelapor', currentUser?.name);
+                formData.append('pelapor', userData?.name);
                 formData.append('lokasi', JSON.stringify(location));
                 formData.append('kabupatenkota', values.nama_daerah);
                 formData.append('jenispengaduan', values.jenis_pengaduan);
@@ -144,8 +150,9 @@ export const TambahPengaduanScreen: React.FC = observer(
                     name: 'report-photo.jpg',
                   });
                 }
-                await createReport(formData);
-                if (loading2 === false) {
+                await postPengaduan(formData);
+
+                if (!loading4) {
                   detailPengaduanStore.getDataDetailPengaduan();
                   navigation.navigate('Pengaduan');
                 }
@@ -161,7 +168,7 @@ export const TambahPengaduanScreen: React.FC = observer(
                 <>
                   <Text style={styles.fontTitle}>Kota</Text>
                   <Dropdown
-                    data={kabupatenKotaList.map(item => ({
+                    data={KabupatenKotaList.map(item => ({
                       value: item.kabupatenkota,
                       title: item.kabupatenkota,
                     }))}
@@ -199,7 +206,7 @@ export const TambahPengaduanScreen: React.FC = observer(
                   )}
                   <Text style={styles.fontTitle}>Jenis Pengaduan</Text>
                   <Dropdown
-                    data={jenisPengaduanList.map(item => ({
+                    data={jenisPengaduan.map(item => ({
                       value: item.jenisPengaduan,
                       title: item.jenisPengaduan,
                     }))}

@@ -1,14 +1,19 @@
 import axios from "axios";
-import { penggunaStore } from "./PenggunaUtils";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const axiosInstance = axios.create();
 
-axiosInstance.interceptors.request.use((config) => {
-  const token = penggunaStore.currentUser?.token  ;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+axiosInstance.interceptors.request.use(
+  async (config) => {
+    const token = await AsyncStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
 export default axiosInstance;

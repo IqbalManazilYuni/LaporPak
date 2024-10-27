@@ -1,27 +1,35 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
-import Modal from 'react-native-modal';
-import { caladeaBold, caladeaReguler, ramarajaReguler } from '../../../assets/fonts/FontFamily';
+import {View, Text, TouchableOpacity, Dimensions, Modal} from 'react-native';
+import {
+  caladeaBold,
+  caladeaReguler,
+  ramarajaReguler,
+} from '../../../assets/fonts/FontFamily';
 
-const { height } = Dimensions.get('window');
+const {height} = Dimensions.get('window');
 
 interface ModalTentangProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const ModalTentang: React.FC<ModalTentangProps> = ({ isOpen, onClose }) => {
+const ModalTentang: React.FC<ModalTentangProps> = ({isOpen, onClose}) => {
+  if (!isOpen) return null;
+
   return (
-    <Modal
-      isVisible={isOpen}
-      animationIn={'bounceIn'}
-      animationOut={'bounceOut'}
-      onBackdropPress={onClose}>
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+    <Modal visible={isOpen} animationType="fade" transparent={true}>
+      <TouchableOpacity
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          justifyContent: 'center',
+        }}
+        onPress={onClose}>
         <View
           style={{
             height: '30%',
-            width: '100%',
+            width: '90%',
             backgroundColor: 'white',
             flexDirection: 'column',
             borderRadius: 16,
@@ -42,7 +50,8 @@ const ModalTentang: React.FC<ModalTentangProps> = ({ isOpen, onClose }) => {
               color: '#707070',
               fontSize: height * 0.025,
             }}>
-            Lapor Pak Sumbar adalah Aplikasi untuk pengaduan masyarakat Provinsi Sumatera Barat
+            Lapor Pak Sumbar adalah Aplikasi untuk pengaduan masyarakat Provinsi
+            Sumatera Barat
           </Text>
           <View
             style={{
@@ -62,7 +71,7 @@ const ModalTentang: React.FC<ModalTentangProps> = ({ isOpen, onClose }) => {
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     </Modal>
   );
 };

@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Alert,
   BackHandler,
@@ -21,15 +21,22 @@ import {
 const {width, height} = Dimensions.get('window');
 import {Formik} from 'formik';
 import * as Yup from 'yup';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {
+  NavigationProp,
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
-import {useLoginPengguna} from '../../hook/tambahPengguna';
 import Loading from '../../components/loading/Loading';
+import axios from 'axios';
+import {RootStackParamList} from '../../navigator/AppNavigator';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useMutation} from '@tanstack/react-query';
+import {postLogin} from '../../hook/loginHook';
 
 export const LoginScreen = ({}) => {
-  const navigation = useNavigation();
-  const {loginPengguna, loading, error} = useLoginPengguna();
-
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [loading, setLoading] = useState(false);
   useFocusEffect(
     React.useCallback(() => {
       const backAction = () => {
@@ -56,6 +63,26 @@ export const LoginScreen = ({}) => {
   const handleNextPageDaftar = () => {
     navigation.navigate('Register');
   };
+
+  const mutation = useMutation(postLogin, {
+    onSuccess: async data => {
+      await AsyncStorage.setItem('authToken', data.token);
+      Toast.show({
+        type: 'success',
+        text1: 'Berhasil',
+        text2: 'Anda Berhasil Login',
+      });
+      setLoading(false);
+      navigation.navigate('Home');
+    },
+    onError: error => {
+      const errorMessage =
+        error.response?.data?.message || 'Terjadi kesalahan.';
+      Toast.show({type: 'error', text1: 'Login gagal', text2: errorMessage});
+      setLoading(false);
+    },
+  });
+
   return (
     <SafeAreaView style={styles.backgroundScreen}>
       <StatusBar backgroundColor={'#444444'} />
@@ -94,23 +121,11 @@ export const LoginScreen = ({}) => {
           initialValues={{username: '', password: ''}}
           validationSchema={validationSchema}
           onSubmit={async values => {
-            console.log(values);
-
-            const result = await loginPengguna(values);
-            if (result?.success) {
-              Toast.show({
-                type: 'success',
-                text1: 'Berhasil',
-                text2: result.message,
-              });
-              navigation.navigate('Home');
-            } else {
-              Toast.show({
-                type: 'error',
-                text1: 'Gagal',
-                text2: result?.message,
-              });
-            }
+            setLoading(true);
+            mutation.mutate({
+              username: values.username,
+              password: values.password,
+            });
           }}>
           {({
             handleChange,
@@ -233,10 +248,8 @@ export const LoginScreen = ({}) => {
   );
 };
 const validationSchema = Yup.object().shape({
-  username: Yup.string()
-    .required('Username wajib diisi'),
-  password: Yup.string()
-    .required('Password wajib diisi'),
+  username: Yup.string().required('Username wajib diisi'),
+  password: Yup.string().required('Password wajib diisi'),
 });
 const styles = StyleSheet.create({
   backgroundScreen: {

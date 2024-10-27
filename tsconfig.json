@@ -1,6 +1,10 @@
 {
   "extends": "@react-native/typescript-config/tsconfig.json",
   "compilerOptions": {
-    "jsx": "react-native"
+    "jsx": "react-native",
+    "types": ["@tanstack/react-query"],
+    "skipLibCheck": true, // Menghindari error tipe dari dependensi eksternal
+    "esModuleInterop": true, // Pastikan kompatibilitas impor modul
+    "strict": true // Opsional: untuk validasi ketat kode TypeScript
   }
 }

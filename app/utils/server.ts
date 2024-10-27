@@ -1,1 +1,1 @@
-export const API_BASE_URL = "https://be-lapor-pak.vercel.app"
+export const API_BASE_URL = "http://192.168.100.128:5000"

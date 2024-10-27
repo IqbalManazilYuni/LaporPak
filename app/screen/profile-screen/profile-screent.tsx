@@ -30,6 +30,7 @@ import {Dropdown} from 'react-native-element-dropdown';
 const {height, width} = Dimensions.get('window');
 
 export const ProfileScreen: React.FC = observer(function ProfileScreen() {
+  
   const navigation = useNavigation();
   const {currentUser} = penggunaStore;
   const [isChange, setIsChange] = useState<boolean>(false);

@@ -38,12 +38,12 @@ import {observer} from 'mobx-react-lite';
 import moment from 'moment';
 import 'moment/locale/id';
 import Loading from '../../components/loading/Loading';
-import {useFetchSertifikat} from '../../hook/sertifikatHook';
 import {sertifikatStore} from '../../utils/SertifikatUtils';
-import Pdf from 'react-native-pdf';
 import axiosInstance from '../../utils/axiosInterceptors';
 import {API_BASE_URL} from '../../utils/server';
 import {penggunaStore} from '../../utils/PenggunaUtils';
+import useFetchUserByToken from '../../hook/fetchByToken';
+import useFetchSertifikat from '../../hook/fetchSertifikat';
 
 const {width, height} = Dimensions.get('window');
 
@@ -52,11 +52,17 @@ export const NotifikasiScreen: React.FC = observer(function NotifikasiScreen() {
   const isFocused = useIsFocused();
   const {currentUser, logout} = penggunaStore;
   moment.locale('id');
-  const {sertifikatList, loading} = useFetchSertifikat();
-
-  const data = sertifikatList;
+  const {userData, loading, error} = useFetchUserByToken();
+  const {dataSertifikat, loading7, error7} = useFetchSertifikat({
+    name: userData?.name,
+  });
+  const data = dataSertifikat;
   const [dataFilter, setDataFilter] = useState(data);
   const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    setDataFilter(data);
+  }, [data]);
 
   const fetchData = async () => {
     if (currentUser) {
