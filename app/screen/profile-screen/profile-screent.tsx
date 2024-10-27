@@ -1,5 +1,4 @@
-import React, {useState} from 'react';
-import {observer} from 'mobx-react-lite';
+import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
   Image,
@@ -14,37 +13,57 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Header} from '../../components/header/Header';
 import {IconLeftBack, IconUbahProfile} from '../../assets';
-import {useNavigation} from '@react-navigation/native';
+import {
+  NavigationProp,
+  useNavigation,
+} from '@react-navigation/native';
 import {caladeaBold, caladeaReguler} from '../../assets/fonts/FontFamily';
-import {penggunaStore} from '../../utils/PenggunaUtils';
 import {
   launchImageLibrary,
   ImageLibraryOptions,
 } from 'react-native-image-picker';
 import axiosInstance from '../../utils/axiosInterceptors';
 import {API_BASE_URL} from '../../utils/server';
-import {useFetchKabupatenKota} from '../../hook/kabupatenKotaHook';
 import {Dropdown} from 'react-native-element-dropdown';
+import useKabupateKota from '../../hook/fetchKabupateKota';
+import {RootStackParamList} from '../../navigator/AppNavigator';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Loading from '../../components/loading/Loading';
+import {PesanError} from '../../components/errot';
+import useFetchUserByToken from '../../hook/fetchByToken';
+import Toast from 'react-native-toast-message';
 
 // Mendapatkan dimensi layar
 const {height, width} = Dimensions.get('window');
 
-export const ProfileScreen: React.FC = observer(function ProfileScreen() {
-  
-  const navigation = useNavigation();
-  const {currentUser} = penggunaStore;
+export const ProfileScreen = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const {userData, loading, error} = useFetchUserByToken();
   const [isChange, setIsChange] = useState<boolean>(false);
-  const [profileImage, setProfileImage] = useState(currentUser?.uri_profle); // State untuk menyimpan URI gambar
-  const [isModal, setModal] = useState(false); // State untuk modal
-  const {kabupatenKotaList, loading1} = useFetchKabupatenKota();
-  const [nama, setNama] = useState(currentUser?.name);
-  const [kontak, setKontak] = useState(currentUser?.nomor_hp);
-  const [username, setUsername] = useState(currentUser?.username);
-  const [addres, setAddres] = useState(currentUser?.addres);
+  const [profileImage, setProfileImage] = useState<string | undefined>();
+  const [isModal, setModal] = useState(false);
+  const {
+    KabupatenKotaList: kabupatenKotaList,
+    loading5,
+    error5,
+  } = useKabupateKota();
+  const [nama, setNama] = useState<string | undefined>();
+  const [kontak, setKontak] = useState<string | undefined>();
+  const [username, setUsername] = useState<string | undefined>();
+  const [addres, setAddres] = useState<string | undefined>();
+  const [loadingUbah, setLoading] = useState(false);
   const options: ImageLibraryOptions = {
     mediaType: 'photo',
     quality: 1,
   };
+
+  useEffect(() => {
+    setProfileImage(userData?.uri_profle);
+    setNama(userData?.name);
+    setKontak(userData?.nomor_hp);
+    setUsername(userData?.username);
+    setAddres(userData?.addres);
+  }, [userData]);
 
   const handleChangeProfile = () => {
     launchImageLibrary(options, response => {
@@ -63,9 +82,10 @@ export const ProfileScreen: React.FC = observer(function ProfileScreen() {
   };
 
   const handleSubmitUbah = async () => {
+    setLoading(true);
     try {
       const formData = new FormData();
-      formData.append('_id', currentUser?._id);
+      formData.append('_id', userData?.id);
       formData.append('name', nama);
       formData.append('username', username);
       formData.append('nomor_hp', kontak);
@@ -77,23 +97,41 @@ export const ProfileScreen: React.FC = observer(function ProfileScreen() {
           name: 'photo.jpg',
         });
       }
-      console.log(formData);
-
       const response = await axiosInstance.put(
         `${API_BASE_URL}/api/pengguna/edit-pengguna-mobile`,
         formData,
         {headers: {'Content-Type': 'multipart/form-data'}},
       );
-      console.log('Response:', response.data);
       if (response.data.code === 200) {
-        await penggunaStore.logout();
+        await AsyncStorage.removeItem('authToken');
+        Toast.show({
+          type: 'success',
+          text1: 'Berhasil',
+          text2: 'Anda Berhasil Keluar',
+        });
         navigation.reset({
           index: 0,
           routes: [{name: 'Login'}],
         });
       }
     } catch (error) {
-      console.log(error);
+      if (error.response && error.response.status === 400) {
+        const errorMessage =
+          error.response.data.message || 'Terjadi kesalahan pada permintaan.';
+        Toast.show({
+          type: 'error',
+          text1: 'Gagal',
+          text2: errorMessage,
+        });
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Terjadi kesalahan yang tidak terduga.',
+        });
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -105,9 +143,16 @@ export const ProfileScreen: React.FC = observer(function ProfileScreen() {
     setModal(false);
   };
 
+  const handleUbahPassword = () => {
+    navigation.navigate('ChangePassword', {userData});
+  };
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
       <StatusBar backgroundColor="#444444" translucent={true} />
+      {(loading5 || loading || loadingUbah) && <Loading />}
+      {error5 && <PesanError text={error5} />}
+      {error && <PesanError text={error} />}
       <Header
         TxtMiddle="Profile"
         ImgBack={() => <IconLeftBack />}
@@ -140,7 +185,7 @@ export const ProfileScreen: React.FC = observer(function ProfileScreen() {
               {isChange === true ? (
                 <Text style={styles.fontDeskripsi}>{nama}</Text>
               ) : (
-                <Text style={styles.fontDeskripsi}>{currentUser?.name}</Text>
+                <Text style={styles.fontDeskripsi}>{userData?.name}</Text>
               )}
             </View>
             <View style={{width: '15%'}}>
@@ -154,7 +199,7 @@ export const ProfileScreen: React.FC = observer(function ProfileScreen() {
             {isChange === true ? (
               <Text style={styles.fontDeskripsi}>{username}</Text>
             ) : (
-              <Text style={styles.fontDeskripsi}>{currentUser?.username}</Text>
+              <Text style={styles.fontDeskripsi}>{userData?.username}</Text>
             )}
           </View>
           <View style={styles.infoBlock}>
@@ -162,7 +207,7 @@ export const ProfileScreen: React.FC = observer(function ProfileScreen() {
             {isChange === true ? (
               <Text style={styles.fontDeskripsi}>{kontak}</Text>
             ) : (
-              <Text style={styles.fontDeskripsi}>{currentUser?.nomor_hp}</Text>
+              <Text style={styles.fontDeskripsi}>{userData?.nomor_hp}</Text>
             )}
           </View>
           <View style={styles.infoBlock}>
@@ -170,7 +215,7 @@ export const ProfileScreen: React.FC = observer(function ProfileScreen() {
             {isChange === true ? (
               <Text style={styles.fontDeskripsi}>{addres}</Text>
             ) : (
-              <Text style={styles.fontDeskripsi}>{currentUser?.addres}</Text>
+              <Text style={styles.fontDeskripsi}>{userData?.addres}</Text>
             )}
           </View>
         </View>
@@ -182,7 +227,9 @@ export const ProfileScreen: React.FC = observer(function ProfileScreen() {
               <Text style={styles.buttonText}>Ubah Profile</Text>
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity style={styles.yellowButton}>
+            <TouchableOpacity
+              style={styles.yellowButton}
+              onPress={handleUbahPassword}>
               <Text style={styles.buttonText}>Ubah Password</Text>
             </TouchableOpacity>
           )}
@@ -321,7 +368,7 @@ export const ProfileScreen: React.FC = observer(function ProfileScreen() {
       </Modal>
     </SafeAreaView>
   );
-});
+};
 
 const styles = StyleSheet.create({
   profileContainer: {

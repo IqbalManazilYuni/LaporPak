@@ -18,16 +18,12 @@ import {
   IconLeftBack,
   IconPapan,
   IconPeoplePengaduang,
-  IconSeach,
   IconSuccess,
   IconWarning,
 } from '../../assets';
 import {
   NavigationProp,
-  useFocusEffect,
-  useIsFocused,
   useNavigation,
-  useRoute,
 } from '@react-navigation/native';
 import SearchComponent from '../../components/search/Search';
 import {
@@ -35,11 +31,7 @@ import {
   caladeaReguler,
   ramarajaReguler,
 } from '../../assets/fonts/FontFamily';
-import {useFetchDetailPengaduan} from '../../hook/tambahPengaduan';
-import {observer} from 'mobx-react-lite';
 import Loading from '../../components/loading/Loading';
-import {detailPengaduanStore} from '../../utils/DetailPengaduanUtils';
-import {penggunaStore} from '../../utils/PenggunaUtils';
 import useFetchJumlahPengaduan from '../../hook/fetchPengaduan';
 import {PesanError} from '../../components/errot';
 import {RootStackParamList} from '../../navigator/AppNavigator';
@@ -47,7 +39,7 @@ import useFetchUserByToken from '../../hook/fetchByToken';
 
 const {width, height} = Dimensions.get('window');
 
-export const PengaduanScreen: React.FC = observer(function PengaduanScreen() {
+export const PengaduanScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const {userData, loading, error} = useFetchUserByToken();
   const {data, loading1, error1, refetch} = useFetchJumlahPengaduan({
@@ -59,6 +51,7 @@ export const PengaduanScreen: React.FC = observer(function PengaduanScreen() {
   useEffect(() => {
     setDataFilter(data);
   }, [data]);
+
   const handleTambahPelaporan = () => {
     navigation.navigate('TambahPengaduan');
   };
@@ -225,7 +218,7 @@ export const PengaduanScreen: React.FC = observer(function PengaduanScreen() {
       </View>
     </SafeAreaView>
   );
-});
+};
 
 const styles = StyleSheet.create({
   container: {

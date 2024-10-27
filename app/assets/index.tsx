@@ -31,3 +31,4 @@ export {default as IconNotifSudah} from './homescreen/lonceng-sudah.svg';
 export {default as IconNotifBelum} from './homescreen/lonceng-belum.svg';
 export {default as IconEmpty} from './sertifikatscreen/empty.svg';
 export {default as IconUbahProfile} from './profile/message-edit.svg';
+export {default as IconEye} from './profile/eye.svg';

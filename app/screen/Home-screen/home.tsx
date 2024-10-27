@@ -30,15 +30,15 @@ import {
   useIsFocused,
   useNavigation,
 } from '@react-navigation/native';
-import {penggunaStore} from '../../utils/PenggunaUtils';
 import ModalTentang from '../../components/modal/modal-tentang/ModalTentang';
 import Loading from '../../components/loading/Loading';
-import {observer} from 'mobx-react-lite';
 import useFetchUserByToken from '../../hook/fetchByToken';
 import {PesanError} from '../../components/errot';
 import useFetchJumlahPengaduan from '../../hook/fetchPengaduan';
 import {RootStackParamList} from '../../navigator/AppNavigator';
 import useFetchSertifikat from '../../hook/fetchSertifikat';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
 
 const {width, height} = Dimensions.get('window');
 
@@ -75,7 +75,7 @@ const images = [
   {id: '3', src: require('../../assets/homescreen/foto.png')},
 ];
 
-export const HomeScreen: React.FC = observer(function HomeScreen() {
+export const HomeScreen = () => {
   const {userData, loading, error} = useFetchUserByToken();
   const {data, loading1, error1} = useFetchJumlahPengaduan({
     name: userData?.name,
@@ -112,6 +112,19 @@ export const HomeScreen: React.FC = observer(function HomeScreen() {
     setModalVisible(false);
   };
 
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('authToken');
+    navigation.reset({
+      index: 0,
+      routes: [{name: 'Login'}],
+    });
+    Toast.show({
+      type: 'success',
+      text1: 'Berhasil',
+      text2: 'Anda Berhasil Keluar',
+    });
+  };
+
   useFocusEffect(
     React.useCallback(() => {
       const backAction = () => {
@@ -131,11 +144,7 @@ export const HomeScreen: React.FC = observer(function HomeScreen() {
     } else if (title === 'Pengaduan') {
       navigation.navigate('Pengaduan');
     } else if (title === 'Keluar') {
-      await penggunaStore.logout();
-      navigation.reset({
-        index: 0,
-        routes: [{name: 'Login'}],
-      });
+      handleLogout();
     } else if (title === 'Sertifikat') {
       navigation.navigate('Sertifikat');
     } else if (title === 'Profile') {
@@ -156,10 +165,8 @@ export const HomeScreen: React.FC = observer(function HomeScreen() {
   };
   return (
     <SafeAreaView style={styles.backgroundScreen}>
-      {loading && <Loading />}
-      {loading1 && <Loading />}
+      {(loading || loading1 || loading7) && <Loading />}
       {error && <PesanError text={error} />}
-      {loading7 && <Loading />}
       {error7 && <PesanError text={error7} />}
       {error1 && <PesanError text={error1} />}
       <View style={styles.contentHeader}>
@@ -175,7 +182,7 @@ export const HomeScreen: React.FC = observer(function HomeScreen() {
             </View>
             <TouchableOpacity
               style={styles.profilePicture}
-              onPress={() => navigation.navigate('Profile')}>
+              onPress={() => navigation.navigate('Profile', [userData])}>
               {userData?.uri_profle ? (
                 <Image
                   source={{uri: userData?.uri_profle}}
@@ -259,7 +266,7 @@ export const HomeScreen: React.FC = observer(function HomeScreen() {
       <ModalTentang isOpen={isModalVisible} onClose={closeModal} />
     </SafeAreaView>
   );
-});
+};
 
 const styles = StyleSheet.create({
   backgroundScreen: {

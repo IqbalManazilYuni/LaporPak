@@ -1,11 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
-  Image,
   ScrollView,
   StatusBar,
   StyleSheet,
-  TouchableOpacity,
   View,
   Text,
   RefreshControl,
@@ -13,47 +11,31 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Header} from '../../components/header/Header';
 import {
-  IconAdd,
   IconEmpty,
   IconLeftBack,
-  IconPapan,
-  IconPeoplePengaduang,
-  IconSeach,
-  IconSeru,
-  IconSuccess,
-  IconTanggalDetail,
-  IconWarning,
 } from '../../assets';
 import {
-  useFocusEffect,
-  useIsFocused,
   useNavigation,
 } from '@react-navigation/native';
 import {
   caladeaBold,
   caladeaReguler,
-  ramarajaReguler,
 } from '../../assets/fonts/FontFamily';
-import {observer} from 'mobx-react-lite';
 import moment from 'moment';
 import 'moment/locale/id';
 import Loading from '../../components/loading/Loading';
-import {sertifikatStore} from '../../utils/SertifikatUtils';
 import axiosInstance from '../../utils/axiosInterceptors';
 import {API_BASE_URL} from '../../utils/server';
-import {penggunaStore} from '../../utils/PenggunaUtils';
 import useFetchUserByToken from '../../hook/fetchByToken';
 import useFetchSertifikat from '../../hook/fetchSertifikat';
+import {PesanError} from '../../components/errot';
 
 const {width, height} = Dimensions.get('window');
 
-export const NotifikasiScreen: React.FC = observer(function NotifikasiScreen() {
+export const NotifikasiScreen = () => {
   const navigation = useNavigation();
-  const isFocused = useIsFocused();
-  const {currentUser, logout} = penggunaStore;
-  moment.locale('id');
   const {userData, loading, error} = useFetchUserByToken();
-  const {dataSertifikat, loading7, error7} = useFetchSertifikat({
+  const {dataSertifikat, loading7, refetch, error7} = useFetchSertifikat({
     name: userData?.name,
   });
   const data = dataSertifikat;
@@ -64,25 +46,17 @@ export const NotifikasiScreen: React.FC = observer(function NotifikasiScreen() {
     setDataFilter(data);
   }, [data]);
 
-  const fetchData = async () => {
-    if (currentUser) {
-      await sertifikatStore.getDataSertifikat();
-      setDataFilter(sertifikatStore.sertifikat);
-    }
-  };
   const fetchData2 = async () => {
-    if (currentUser) {
-      setRefreshing(true);
-      await sertifikatStore.getDataSertifikat();
-      setDataFilter(sertifikatStore.sertifikat);
-      setRefreshing(false);
-    }
+    setRefreshing(true);
+    await refetch();
+    setDataFilter(data);
+    setRefreshing(false);
   };
 
   useEffect(() => {
-    if (sertifikatList.length > 0) {
+    if (dataSertifikat.length > 0) {
       const handleSumbit = async () => {
-        const dataFilter = sertifikatList.filter(
+        const dataFilter = dataSertifikat.filter(
           item => item.status_notif === 'tersampaikan',
         );
         if (dataFilter.length > 0) {
@@ -104,12 +78,7 @@ export const NotifikasiScreen: React.FC = observer(function NotifikasiScreen() {
       };
       handleSumbit();
     }
-  }, [sertifikatList]);
-  useEffect(() => {
-    if (currentUser) {
-      fetchData();
-    }
-  }, [isFocused, currentUser]);
+  }, [dataSertifikat]);
 
   const getRelativeTime = (date: string) => {
     const now = moment();
@@ -147,8 +116,9 @@ export const NotifikasiScreen: React.FC = observer(function NotifikasiScreen() {
         ImgBack={() => <IconLeftBack />}
         onBackPress={() => navigation.goBack()}
       />
-      {loading && <Loading />}
-      {sertifikatStore.loading && <Loading />}
+      {(loading || loading7) && <Loading />}
+      {error7 && <PesanError text={error7} />}
+      {error && <PesanError text={error} />}
 
       <ScrollView
         style={{flex: 1, marginTop: height * 0.02}}
@@ -210,7 +180,7 @@ export const NotifikasiScreen: React.FC = observer(function NotifikasiScreen() {
       </ScrollView>
     </SafeAreaView>
   );
-});
+};
 
 const styles = StyleSheet.create({
   container: {

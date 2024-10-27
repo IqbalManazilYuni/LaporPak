@@ -13,73 +13,54 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Header} from '../../components/header/Header';
 import {
-  IconAdd,
   IconEmpty,
   IconLeftBack,
-  IconPapan,
   IconPeoplePengaduang,
-  IconSeach,
   IconSeru,
-  IconSuccess,
   IconTanggalDetail,
-  IconWarning,
 } from '../../assets';
-import {
-  useFocusEffect,
-  useIsFocused,
-  useNavigation,
-} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import {
   caladeaBold,
   caladeaReguler,
   ramarajaReguler,
 } from '../../assets/fonts/FontFamily';
-import {observer} from 'mobx-react-lite';
 import moment from 'moment';
 import 'moment/locale/id';
 import Loading from '../../components/loading/Loading';
-import {useFetchSertifikat} from '../../hook/sertifikatHook';
-import {sertifikatStore} from '../../utils/SertifikatUtils';
-import {penggunaStore} from '../../utils/PenggunaUtils';
+import useFetchSertifikat from '../../hook/fetchSertifikat';
+import useFetchUserByToken from '../../hook/fetchByToken';
+import {PesanError} from '../../components/errot';
 
 const {width, height} = Dimensions.get('window');
 
-export const SertifikatScreen: React.FC = observer(function SertifikatScreen() {
-  const {currentUser, logout} = penggunaStore;
+export const SertifikatScreen = () => {
   const navigation = useNavigation();
-  const isFocused = useIsFocused();
-  moment.locale('id');
-  const {sertifikatList, loading} = useFetchSertifikat();
+  const {userData, loading, error} = useFetchUserByToken();
 
-  const data = sertifikatList;
+  const {dataSertifikat, loading7, refetch, error7} = useFetchSertifikat({
+    name: userData?.name,
+  });
+
+  const data = dataSertifikat;
   const [dataFilter, setDataFilter] = useState(data);
   const [refreshing, setRefreshing] = useState(false);
 
-  const fetchData = async () => {
-    if (currentUser) {
-      await sertifikatStore.getDataSertifikat();
-      setDataFilter(sertifikatStore.sertifikat);
-    }
-  };
-  const fetchData2 = async () => {
-    if (currentUser) {
-      setRefreshing(true);
-      await sertifikatStore.getDataSertifikat();
-      setDataFilter(sertifikatStore.sertifikat);
-      setRefreshing(false);
-    }
-  };
-
   useEffect(() => {
-    if (currentUser) {
-      fetchData();
-    }
-  }, [isFocused, currentUser]);
+    setDataFilter(data);
+  }, [data]);
+
+  const fetchData2 = async () => {
+    setRefreshing(true);
+    await refetch();
+    setDataFilter(data);
+    setRefreshing(false);
+  };
 
   const handleDetail = (id: any) => {
     const dataPengaduan = dataFilter.find(item => item._id === id);
     navigation.navigate('DetailSertifikat', {
-      state: {_id: dataPengaduan?._id},
+      dataPengaduan,
     });
   };
   return (
@@ -91,7 +72,9 @@ export const SertifikatScreen: React.FC = observer(function SertifikatScreen() {
         onBackPress={() => navigation.goBack()}
       />
       {loading && <Loading />}
-      {sertifikatStore.loading && <Loading />}
+      {loading7 && <Loading />}
+      {error7 && <PesanError text={error7} />}
+      {error && <PesanError text={error} />}
 
       <View
         style={{width: '100%', justifyContent: 'center', alignItems: 'center'}}>
@@ -179,10 +162,9 @@ export const SertifikatScreen: React.FC = observer(function SertifikatScreen() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 // height: height,
-                marginTop:height*0.2,
+                marginTop: height * 0.2,
                 flexDirection: 'column',
               }}>
-
               <IconEmpty />
               <Text
                 style={{
@@ -207,7 +189,7 @@ export const SertifikatScreen: React.FC = observer(function SertifikatScreen() {
       </ScrollView>
     </SafeAreaView>
   );
-});
+};
 
 const styles = StyleSheet.create({
   container: {

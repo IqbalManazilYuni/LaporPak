@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   Dimensions,
   Image,
@@ -23,12 +23,11 @@ import {
   IconWarning,
 } from '../../assets';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {observer} from 'mobx-react-lite';
 import {caladeaReguler, ramarajaReguler} from '../../assets/fonts/FontFamily';
 
 const {height} = Dimensions.get('window');
 
-export const DetailPengaduanScreen = observer(function DetailPengaduanScreen() {
+export const DetailPengaduanScreen = () => {
   const route = useRoute();
   const {dataPengaduan} = route.params as {dataPengaduan: any};
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -214,7 +213,7 @@ export const DetailPengaduanScreen = observer(function DetailPengaduanScreen() {
       </Modal>
     </SafeAreaView>
   );
-});
+};
 
 const styles = StyleSheet.create({
   container: {

@@ -11,8 +11,7 @@ import {SertifikatScreen} from '../screen/sertifikat-screen/sertifikat-screen';
 import {DetailSertifikatScreen} from '../screen/sertifikat-screen/detail-sertifikat-screen';
 import {NotifikasiScreen} from '../screen/notifikasi-screen/notifikasi-screent';
 import {ProfileScreen} from '../screen/profile-screen/profile-screent';
-import {isLoggedIn} from '../utils/auth';
-import Loading from '../components/loading/Loading';
+import { ResetPasswordScreen } from '../screen/reset-password/reset-password';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -26,26 +25,12 @@ export type RootStackParamList = {
   DetailSertifikat: undefined;
   Notifikasi: undefined;
   Profile: undefined;
+  ChangePassword: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const AppNavigator: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const checkLoginStatus = async () => {
-      const loggedIn = await isLoggedIn();
-      setIsAuthenticated(loggedIn);
-    };
-    checkLoginStatus();
-  }, []);
-
-  if (isAuthenticated === null) {
-    // Jika status autentikasi belum diketahui, arahkan ke Login
-    return <Loading />;
-  }
-
   return (
     <Stack.Navigator
       initialRouteName="Splash"
@@ -53,31 +38,18 @@ const AppNavigator: React.FC = () => {
       <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
-
-      {isAuthenticated ? (
-        <>
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="Pengaduan" component={PengaduanScreen} />
-          <Stack.Screen
-            name="TambahPengaduan"
-            component={TambahPengaduanScreen}
-          />
-          <Stack.Screen
-            name="DetailPengaduan"
-            component={DetailPengaduanScreen}
-          />
-          <Stack.Screen name="Sertifikat" component={SertifikatScreen} />
-          <Stack.Screen name="Notifikasi" component={NotifikasiScreen} />
-          <Stack.Screen name="Profile" component={ProfileScreen} />
-          <Stack.Screen
-            name="DetailSertifikat"
-            component={DetailSertifikatScreen}
-          />
-        </>
-      ) : (
-        // Jika tidak terautentikasi, navigasi ke Login
-        <Stack.Screen name="Login" component={LoginScreen} />
-      )}
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Pengaduan" component={PengaduanScreen} />
+      <Stack.Screen name="TambahPengaduan" component={TambahPengaduanScreen} />
+      <Stack.Screen name="DetailPengaduan" component={DetailPengaduanScreen} />
+      <Stack.Screen name="Sertifikat" component={SertifikatScreen} />
+      <Stack.Screen name="Notifikasi" component={NotifikasiScreen} />
+      <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="ChangePassword" component={ResetPasswordScreen} />
+      <Stack.Screen
+        name="DetailSertifikat"
+        component={DetailSertifikatScreen}
+      />
     </Stack.Navigator>
   );
 };

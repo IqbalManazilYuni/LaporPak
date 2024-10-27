@@ -1,7 +1,5 @@
 import React, {useState} from 'react';
 import {
-  Alert,
-  Button,
   Dimensions,
   ScrollView,
   StatusBar,
@@ -28,36 +26,39 @@ import {
 const {width, height} = Dimensions.get('window');
 import {Formik} from 'formik';
 import * as Yup from 'yup';
-import {useNavigation} from '@react-navigation/native';
-import {useCreatePengguna} from '../../hook/tambahPengguna';
-import Toast from 'react-native-toast-message';
-import {useFetchKabupatenKota} from '../../hook/kabupatenKotaHook';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import Loading from '../../components/loading/Loading';
 import {Dropdown} from 'react-native-element-dropdown';
+import useKabupateKota from '../../hook/fetchKabupateKota';
+import {PesanError} from '../../components/errot';
+import {RootStackParamList} from '../../navigator/AppNavigator';
+import Toast from 'react-native-toast-message';
+import {useMutation} from '@tanstack/react-query';
+import {postRegister} from '../../hook/createMasyarakatHooks';
 
-export const RegisterScreen = ({}) => {
-  const navigation = useNavigation();
-  const {createPengguna, loading, error} = useCreatePengguna();
-  const {kabupatenKotaList, loading1} = useFetchKabupatenKota();
-
+export const RegisterScreen = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const {KabupatenKotaList, loading5, error5} = useKabupateKota();
   const [modalOpen, setModalOpen] = useState(false);
-  const handleFormSubmit = async (values: any) => {
-    const result = await createPengguna(values); // Panggil MobX action
-    if (result?.success) {
+  const [loading, setLoading] = useState(false);
+
+  const mutation = useMutation(postRegister, {
+    onSuccess: async data => {
       Toast.show({
         type: 'success',
         text1: 'Berhasil',
-        text2: result.message,
+        text2: 'Anda Berhasil Membuat Akun',
       });
+      setLoading(false);
       navigation.navigate('Login');
-    } else {
-      Toast.show({
-        type: 'error',
-        text1: 'Gagal',
-        text2: result?.message,
-      });
-    }
-  };
+    },
+    onError: error => {
+      const errorMessage =
+        error.response?.data?.message || 'Terjadi kesalahan.';
+      Toast.show({type: 'error', text1: 'Login gagal', text2: errorMessage});
+      setLoading(false);
+    },
+  });
 
   const handleNextPageDaftar = () => {
     navigation.navigate('Login');
@@ -65,8 +66,9 @@ export const RegisterScreen = ({}) => {
   return (
     <SafeAreaView style={styles.backgroundScreen}>
       <StatusBar backgroundColor={'#444444'} />
-      {loading && <Loading />}
-      {loading1 && <Loading />}
+      {(loading5 || loading) && <Loading />}
+      {error5 && <PesanError text={error5} />}
+
       <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false}>
         <View style={styles.contentUp}>
           <Text
@@ -107,7 +109,16 @@ export const RegisterScreen = ({}) => {
               addres: '',
             }}
             validationSchema={validationSchema}
-            onSubmit={handleFormSubmit}>
+            onSubmit={async values => {
+              setLoading(true);
+              mutation.mutate({
+                username: values.username,
+                password: values.password,
+                name: values.name,
+                nomor_hp: values.nomor_hp,
+                addres: values.addres,
+              });
+            }}>
             {({
               handleChange,
               handleBlur,
@@ -246,7 +257,7 @@ export const RegisterScreen = ({}) => {
                   </View>
                   <View style={{width: '100%'}}>
                     <Dropdown
-                      data={kabupatenKotaList.map(item => ({
+                      data={KabupatenKotaList.map(item => ({
                         value: item.kabupatenkota,
                         title: item.kabupatenkota,
                       }))}

@@ -1,8 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   Alert,
   BackHandler,
-  Button,
   Dimensions,
   StatusBar,
   StyleSheet,
@@ -18,7 +17,7 @@ import {
   caladeaReguler,
   ramarajaReguler,
 } from '../../assets/fonts/FontFamily';
-const {width, height} = Dimensions.get('window');
+const {height} = Dimensions.get('window');
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import {
@@ -28,7 +27,6 @@ import {
 } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import Loading from '../../components/loading/Loading';
-import axios from 'axios';
 import {RootStackParamList} from '../../navigator/AppNavigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useMutation} from '@tanstack/react-query';
@@ -164,6 +162,7 @@ export const LoginScreen = ({}) => {
                     placeholder="Username"
                     onChangeText={handleChange('username')}
                     onBlur={handleBlur('username')}
+                    placeholderTextColor={'#9CA3AF'}
                     value={values.username}
                   />
                 </View>
@@ -195,6 +194,7 @@ export const LoginScreen = ({}) => {
                     }}
                     placeholder="Password"
                     onChangeText={handleChange('password')}
+                    placeholderTextColor={'#9CA3AF'}
                     onBlur={handleBlur('password')}
                     value={values.password}
                     secureTextEntry={true}
