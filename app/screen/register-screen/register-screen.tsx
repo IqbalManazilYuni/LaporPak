@@ -266,7 +266,7 @@ export const RegisterScreen = () => {
                       search
                       value={values.addres}
                       inputSearchStyle={styles.oNselectedTextStyle}
-                      dropdownPosition="auto"
+                      dropdownPosition="top"
                       placeholderStyle={styles.placeholderStyle}
                       selectedTextStyle={styles.selectedTextStyle}
                       onChange={item => {

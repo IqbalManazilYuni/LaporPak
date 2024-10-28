@@ -9,8 +9,6 @@ const useKabupateKota = () => {
     const [KabupatenKotaList, setData] = useState<KabupatenKota[]>([]);
     const [loading5, setLoading] = useState(true);
     const [error5, setError] = useState(null);
-    console.log("ayamm jenis");
-    
     useEffect(() => {
         if (isFocused) {
             const fetchByToken = async () => {

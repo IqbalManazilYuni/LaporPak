@@ -40,7 +40,10 @@ import useFetchSertifikat from '../../hook/fetchSertifikat';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 
-const {width, height} = Dimensions.get('window');
+const {width: lebar, height} = Dimensions.get('window');
+const mobileWidth = 816 ;
+
+const width = lebar > 816  ? mobileWidth : lebar;
 
 const menu = [
   {
@@ -106,6 +109,8 @@ export const HomeScreen = () => {
 
   const handleNotifPage = () => {
     navigation.navigate('Notifikasi');
+    console.log(width);
+    
   };
 
   const closeModal = () => {
