@@ -234,7 +234,6 @@ export const RegisterScreen = () => {
                 <View
                   style={{
                     width: '80%',
-                    flexDirection: 'row',
                     backgroundColor: '#F9FAFB',
                     height: 45,
                     marginTop: height * 0.025,
@@ -243,18 +242,6 @@ export const RegisterScreen = () => {
                       touched.addres && errors.addres ? 'red' : '#D1D5DB',
                     borderRadius: 8,
                   }}>
-                  <View
-                    style={{
-                      width: '15%',
-                      height: '100%',
-                      alignItems: 'flex-end',
-                      justifyContent: 'center',
-                      position: 'absolute',
-                      zIndex: 1000,
-                      paddingRight: 10,
-                    }}>
-                    <IconHouse />
-                  </View>
                   <View style={{width: '100%'}}>
                     <Dropdown
                       data={KabupatenKotaList.map(item => ({
@@ -267,6 +254,18 @@ export const RegisterScreen = () => {
                       value={values.addres}
                       inputSearchStyle={styles.oNselectedTextStyle}
                       dropdownPosition="top"
+                      renderLeftIcon={() => (
+                        <View
+                          style={{
+                            width: '15%',
+                            height: '100%',
+                            alignItems: 'flex-end',
+                            justifyContent: 'center',
+                            paddingRight: 10,
+                          }}>
+                          <IconHouse />
+                        </View>
+                      )}
                       placeholderStyle={styles.placeholderStyle}
                       selectedTextStyle={styles.selectedTextStyle}
                       onChange={item => {
@@ -277,8 +276,8 @@ export const RegisterScreen = () => {
                       labelField="title"
                       valueField="value"
                       style={{
-                        padding: 10,
                         height: 45,
+                        paddingRight:10,
                       }}
                     />
                   </View>
@@ -383,13 +382,12 @@ const styles = StyleSheet.create({
   placeholderStyle: {
     fontFamily: caladeaReguler,
     color: '#9CA3AF',
-    marginLeft: width * 0.1,
     fontSize: height * 0.02,
   },
   selectedTextStyle: {
     fontFamily: caladeaReguler,
     fontSize: height * 0.02,
-    marginLeft: width * 0.1,
+    paddingLeft:10,
     color: '#9CA3AF',
   },
   oNselectedTextStyle: {
